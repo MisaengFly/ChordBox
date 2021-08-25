@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.moveToRecord).setOnClickListener {
-            startActivity(Intent(this, AudioRecordTest::class.java))
+            startActivity(Intent(this, MusicRecordActivity::class.java))
             finish()
         }
     }

@@ -17,6 +17,7 @@ import java.io.IOException
 
 private const val LOG_TAG = "AudioRecordTest"
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
+private const val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 300
 
 class AudioRecordTest : AppCompatActivity() {
     private var fileName: String = ""
@@ -30,9 +31,10 @@ class AudioRecordTest : AppCompatActivity() {
     /**
      * 퍼미션 요청
      * RECORD_AUDIO
-    **/
+     **/
     private var permissionToRecordAccepted = false
-    private var permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
+    private var permissions: Array<String> =
+        arrayOf(Manifest.permission.RECORD_AUDIO)
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -40,16 +42,20 @@ class AudioRecordTest : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionToRecordAccepted = if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        } else {
-            false
-        }
+
+        permissionToRecordAccepted =
+            when (requestCode) {
+                REQUEST_RECORD_AUDIO_PERMISSION -> {
+                    grantResults[0] > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                } else -> {
+                    false
+                }
+            }
         if (!permissionToRecordAccepted) finish()
     }
 
     /**
-     * 녹음 파트 
+     * 녹음 파트
      **/
     private fun onRecord(start: Boolean) = if (start) {
         startRecording()
