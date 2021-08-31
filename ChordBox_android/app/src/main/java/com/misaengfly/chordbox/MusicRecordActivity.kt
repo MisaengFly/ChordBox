@@ -11,6 +11,7 @@ import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.misaengfly.chordbox.databinding.ActivityMusicRecordBinding
+import timber.log.Timber
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 
@@ -85,7 +86,14 @@ class MusicRecordActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        filePath = "${externalCacheDir?.absolutePath}/musicrecord.m4a"
+//        filePath = "${externalCacheDir?.absolutePath}/musicrecord.m4a"
+
+        val fileCount = filesDir.listFiles { _, name ->
+            name.contains("musicrecord")
+        }.size
+
+        filePath = "${filesDir?.absolutePath}/musicrecord${fileCount}.m4a"
+        Timber.d("filesDir : ${filesDir?.absolutePath}")
         // RecordService 를 Bind
         Intent(this, RecordService::class.java).also { intent: Intent ->
             intent.putExtra("filePath", filePath)
