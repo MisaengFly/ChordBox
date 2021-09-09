@@ -8,8 +8,8 @@
 
     <ImageButton
         android:id="@+id/stop_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="96dp"
         android:backgroundTint="@color/black"
         android:src="@drawable/ic_stop"
@@ -19,8 +19,8 @@
 
     <ImageButton
         android:id="@+id/pause_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:backgroundTint="@color/black"
         android:src="@drawable/ic_pause"
         app:layout_constraintEnd_toEndOf="parent"
