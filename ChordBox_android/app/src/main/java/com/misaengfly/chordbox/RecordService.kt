@@ -91,10 +91,15 @@ class RecordService : Service() {
         val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.notify(NOTIFICATION_ID, builder.build())
 
+        /** 그대로 저장하면 용량이 크다.
+         * 프레임 : 한 순간의 음성이 들어오면, 음성을 바이트 단위로 전부 저장하는 것
+         * 초당 15프레임 이라면 보통 8K(8000바이트) 정도가 한순간에 저장됨
+         * 따라서 용량이 크므로, 압축할 필요가 있음 *
+         **/
         recorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setAudioSource(MediaRecorder.AudioSource.MIC) // 어디에서 음성 데이터를 받을 것인지
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4) // 압축 형식 설정
+            setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC) // 인코딩 방법 설정
             setAudioEncodingBitRate(384000)
             setAudioSamplingRate(44100)
             setOutputFile(filePath)
