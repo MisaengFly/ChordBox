@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
+    <TextView
+        android:id="@+id/record_time_view"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:text="00 : 00"
+        android:textColor="@color/white"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    
     <ImageButton
         android:id="@+id/stop_btn"
         android:layout_width="wrap_content"
@@ -38,23 +52,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/playbutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="125dp"
-        android:text="Play"
-        app:layout_constraintEnd_toStartOf="@+id/stopbutton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/stopbutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop"
+    <TextView
+        android:id="@+id/record_warning"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="16dp"
+        android:text="Record up to 5 minutes"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/record_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/playbutton"
-        app:layout_constraintTop_toTopOf="@+id/playbutton" />
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <ImageView
+        android:id="@+id/recording_view"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/record_time_view"
+        app:layout_constraintEnd_toStartOf="@+id/record_time_view"
+        app:layout_constraintTop_toTopOf="@+id/record_time_view"
+        app:srcCompat="@drawable/ic_recording" />
 </androidx.constraintlayout.widget.ConstraintLayout>

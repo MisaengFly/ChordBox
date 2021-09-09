@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ChordBox</string>
+
+    <string name="channel_id">RecordChannel</string>
+    <string name="channel_name">RecordMusicChannel</string>
+    <string name="channel_description">RecordMusic</string>
 </resources>

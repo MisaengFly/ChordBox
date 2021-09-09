@@ -75,13 +75,13 @@ class MusicRecordActivity : AppCompatActivity() {
             recordService.stopRecording()
         }
 
-        binding.playbutton.setOnClickListener {
-            recordService.onPlay(true)
-        }
-
-        binding.stopbutton.setOnClickListener {
-            recordService.onPlay(false)
-        }
+//        binding.playbutton.setOnClickListener {
+//            recordService.onPlay(true)
+//        }
+//
+//        binding.stopbutton.setOnClickListener {
+//            recordService.onPlay(false)
+//        }
     }
 
     override fun onStart() {
@@ -90,7 +90,7 @@ class MusicRecordActivity : AppCompatActivity() {
 
         val fileCount = filesDir.listFiles { _, name ->
             name.contains("musicrecord")
-        }.size
+        }?.size ?: 0
 
         filePath = "${filesDir?.absolutePath}/musicrecord${fileCount}.m4a"
         Timber.d("filesDir : ${filesDir?.absolutePath}")
