@@ -81,10 +81,10 @@ class RecordService : Service() {
             .setContentTitle("textTitle")
             .setContentText("textContent")
             .setContentIntent(pendingIntent)
-            .setAutoCancel(false)
             .setOngoing(true) // 사용자가 직접 못지우게 설정
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setFullScreenIntent(fullScreenPendingIntent, true)
+        //            .setAutoCancel(false)
     }
 
     fun startRecording() {
@@ -120,6 +120,11 @@ class RecordService : Service() {
             release()
         }
         recorder = null
+
+        // Notify 삭제
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
     }
 
     /**
