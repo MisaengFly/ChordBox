@@ -5,31 +5,33 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
+import com.misaengfly.chordbox.databinding.ItemMusicListBinding
 
-class RecentBoxAdapter : RecyclerView.Adapter<RecentBoxAdapter.ViewHolder>() {
+class RecentBoxAdapter(private val clickListener: MusicItemListener) : RecyclerView.Adapter<RecentBoxAdapter.ViewHolder>() {
 
-    var data = arrayListOf<MusicItem>()
+    var data = listOf<MusicItem>()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    class ViewHolder private constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val musicName = itemView.findViewById<TextView>(R.id.music_title)
-        private val musicDuration = itemView.findViewById<TextView>(R.id.music_duration)
-        private val musicLastModifiedTime = itemView.findViewById<TextView>(R.id.music_record_time)
+    class MusicItemListener(private val clickListener: () -> Unit) {
+        fun onClick(music: MusicItem) = clickListener()
+    }
 
-        fun bind(item: MusicItem) {
-            musicName.text = item.fileName
-            musicDuration.text = item.duration
-            musicLastModifiedTime.text = item.lastModified
+    class ViewHolder private constructor(private val binding: ItemMusicListBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: MusicItem, clickListener: MusicItemListener) {
+            binding.music = item
+            binding.clickListener = clickListener
         }
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_music_list, parent, false)
-                return ViewHolder(view)
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ItemMusicListBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding)
             }
         }
     }
@@ -39,7 +41,7 @@ class RecentBoxAdapter : RecyclerView.Adapter<RecentBoxAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(data[position])
+        holder.bind(data[position], clickListener)
     }
 
     override fun getItemCount(): Int = data.size
