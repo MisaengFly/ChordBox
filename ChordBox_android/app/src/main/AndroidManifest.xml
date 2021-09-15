@@ -30,6 +30,7 @@
         <activity android:name=".MusicRecordActivity"/>
 
         <service android:name=".RecordService"/>
+        <service android:name=".MusicService"/>
     </application>
 
 </manifest>

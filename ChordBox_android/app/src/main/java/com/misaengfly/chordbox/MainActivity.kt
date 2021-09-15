@@ -1,5 +1,7 @@
 package com.misaengfly.chordbox
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -20,5 +22,18 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container, recentBoxFragment)
             .commit()
+    }
+
+    fun startMusicService() {
+        Intent(this, MusicService::class.java).run {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) startForegroundService(this)
+            else startService(this)
+        }
+    }
+
+    fun stopMusicService() {
+        Intent(this, MusicService::class.java).run {
+            stopService(this)
+        }
     }
 }

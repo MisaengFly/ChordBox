@@ -126,33 +126,4 @@ class RecordService : Service() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
     }
-
-    /**
-     * Player 설정
-     **/
-    private var player: MediaPlayer? = null
-
-    fun onPlay(start: Boolean) = if (start) {
-        startPlaying()
-    } else {
-        stopPlaying()
-    }
-
-    private fun startPlaying() {
-        player = MediaPlayer().apply {
-            try {
-//                setDataSource(filePath)
-                setDataSource("${filesDir?.absolutePath}/musicrecord5.m4a")
-                prepare()
-                start()
-            } catch (e: IOException) {
-                Timber.e("prepare() failed")
-            }
-        }
-    }
-
-    private fun stopPlaying() {
-        player?.release()
-        player = null
-    }
 }
