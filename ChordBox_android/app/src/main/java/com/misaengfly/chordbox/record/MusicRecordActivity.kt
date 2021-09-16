@@ -1,4 +1,4 @@
-package com.misaengfly.chordbox
+package com.misaengfly.chordbox.record
 
 import android.Manifest
 import android.content.ComponentName

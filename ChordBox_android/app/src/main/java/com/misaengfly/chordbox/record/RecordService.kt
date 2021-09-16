@@ -1,4 +1,4 @@
-package com.misaengfly.chordbox
+package com.misaengfly.chordbox.record
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Build
@@ -14,6 +13,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.misaengfly.chordbox.R
+import com.misaengfly.chordbox.State
 import timber.log.Timber
 import java.io.IOException
 

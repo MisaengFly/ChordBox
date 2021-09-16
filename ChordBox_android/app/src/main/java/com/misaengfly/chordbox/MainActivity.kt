@@ -23,17 +23,4 @@ class MainActivity : AppCompatActivity() {
             .add(R.id.fragment_container, recentBoxFragment)
             .commit()
     }
-
-    fun startMusicService() {
-        Intent(this, MusicService::class.java).run {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) startForegroundService(this)
-            else startService(this)
-        }
-    }
-
-    fun stopMusicService() {
-        Intent(this, MusicService::class.java).run {
-            stopService(this)
-        }
-    }
 }

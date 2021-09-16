@@ -1,4 +1,4 @@
-package com.misaengfly.chordbox
+package com.misaengfly.chordbox.chord
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

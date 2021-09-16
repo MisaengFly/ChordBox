@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.misaengfly.chordbox.chord.ChordFragment
 import com.misaengfly.chordbox.databinding.FragmentRecentBoxBinding
 
 class RecentBoxFragment : Fragment() {
