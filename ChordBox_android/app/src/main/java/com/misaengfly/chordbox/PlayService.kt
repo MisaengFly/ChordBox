@@ -1,28 +1,27 @@
 package com.misaengfly.chordbox
 
 import android.app.*
-import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import timber.log.Timber
 import java.io.IOException
-import kotlin.concurrent.thread
 
 
-class MusicService : Service(), MediaPlayer.OnPreparedListener {
+class PlayService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     companion object {
-        private const val ONGOING_NOTIFICATION_ID = 1
+        private const val PLAY_NOTIFICATION_ID = 1002
     }
 
     private val channelId = "PlayChannel"
-
     private val notificationManager: NotificationManager
         get() = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    private lateinit var builder: NotificationCompat.Builder
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() = NotificationChannel(
@@ -33,8 +32,19 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener {
         description = "PlayMusic"
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startPlaying()
+
+    private val binder = PlayBinder()
+    inner class PlayBinder() : Binder() {
+        fun getService(): PlayService = this@PlayService
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        initService()
+
+        return binder
+    }
+
+    private fun initService() {
 
         val notificationIntent = Intent(baseContext, MainActivity::class.java).apply {
             this.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -47,41 +57,31 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener {
 
         // 알림 띄우기
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notification: Notification = Notification.Builder(this, channelId)
+            // register Default Notification Channel
+            notificationManager.createNotificationChannel(createNotificationChannel())
+
+            builder = NotificationCompat.Builder(this, channelId)
                 .setContentTitle("음악 실행 중")
                 .setContentText("test")
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.ic_music_note)
                 .setOngoing(true) // 사용자가 직접 못지우게 설정
-                .build()
-
-            startForeground(ONGOING_NOTIFICATION_ID, notification)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
         }
-
-        return START_STICKY
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
     }
 
     override fun onCreate() {
         super.onCreate()
-        registerDefaultNotificationChannel()
-    }
-
-    private fun registerDefaultNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(createNotificationChannel())
-        }
     }
 
     /**
      * Player 설정
      **/
     private var player: MediaPlayer? = null
+    private var curTime: Int = 0
 
-    private fun startPlaying() {
+    fun startPlaying() {
+        curTime = 0
         player = MediaPlayer().apply {
             try {
 //                setAudioAttributes(
@@ -91,20 +91,33 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener {
 //                        .build()
 //                )
 //                setDataSource(filePath)
-                setDataSource("${filesDir?.absolutePath}/musicrecord1.m4a")
+                setDataSource("${filesDir?.absolutePath}/musicrecord0.m4a")
             } catch (e: IOException) {
                 Timber.e("prepare() failed")
             }
         }
 
         player?.apply {
-            setOnPreparedListener(this@MusicService)
+            setOnPreparedListener(this@PlayService)
             prepareAsync()
         }
     }
 
-    private fun stopPlaying() {
-        player?.release()
+    fun pausePlaying() {
+        player?.pause()
+        curTime = player?.currentPosition ?: 0
+    }
+
+    fun resumePlaying() {
+        player?.seekTo(curTime)
+        player?.start()
+    }
+
+    fun stopPlaying() {
+        player?.apply {
+            stop()
+            release()
+        }
         player = null
     }
 
@@ -114,9 +127,16 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener {
     }
 
     /**
-     * Media Player가 준비되면 호출
+     * MediaPlayer가 재생 준비를 완료하면 호출
      **/
     override fun onPrepared(mediaPlayer: MediaPlayer) {
         mediaPlayer.start()
+    }
+
+    /**
+     * MediaPlayer에서 음악 재생이 끝난 경우 이벤트 처리
+     **/
+    override fun onCompletion(p0: MediaPlayer?) {
+        TODO("Not yet implemented")
     }
 }

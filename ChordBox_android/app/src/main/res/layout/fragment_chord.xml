@@ -29,11 +29,11 @@
             android:background="@null"
             android:src="@drawable/ic_play"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/music_fast_forward_btn"
-            app:layout_constraintStart_toEndOf="@+id/music_rewind_btn" />
+            app:layout_constraintEnd_toStartOf="@+id/music_forward_btn"
+            app:layout_constraintStart_toEndOf="@+id/music_backward_btn" />
 
         <ImageButton
-            android:id="@+id/music_rewind_btn"
+            android:id="@+id/music_backward_btn"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -44,7 +44,7 @@
             app:srcCompat="@drawable/ic_rewind" />
 
         <ImageButton
-            android:id="@+id/music_fast_forward_btn"
+            android:id="@+id/music_forward_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"

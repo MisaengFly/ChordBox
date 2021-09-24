@@ -18,7 +18,6 @@ private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 class MusicRecordActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMusicRecordBinding
 
-
     private var filePath: String = ""
 
     /**
@@ -70,6 +69,7 @@ class MusicRecordActivity : AppCompatActivity() {
 
         binding.recordBtn.setOnClickListener {
             recordService.startRecording()
+
         }
 
         binding.stopBtn.setOnClickListener {

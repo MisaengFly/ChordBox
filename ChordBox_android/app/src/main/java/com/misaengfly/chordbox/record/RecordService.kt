@@ -10,7 +10,6 @@ import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.misaengfly.chordbox.R
@@ -21,7 +20,7 @@ import java.io.IOException
 class RecordService : Service() {
 
     companion object {
-        const val NOTIFICATION_ID = 1001
+        private const val RECORD_NOTIFICATION_ID = 1001
     }
 
     private var filePath: String = ""
@@ -46,7 +45,7 @@ class RecordService : Service() {
     }
 
     private fun createNotificationChannel() {
-        val channelId = getString(R.string.channel_id)
+        val channelId = getString(R.string.record_channel_id)
 
         // Create an explicit intent for an Activity in your app
         val intent = Intent(baseContext, MusicRecordActivity::class.java).apply {
@@ -59,8 +58,8 @@ class RecordService : Service() {
 
         // API 26 이상부터 NotificationChannel 생성
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.channel_name)
-            val descriptionText = getString(R.string.channel_description)
+            val name = getString(R.string.record_channel_name)
+            val descriptionText = getString(R.string.record_channel_description)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(channelId, name, importance).apply {
                 description = descriptionText
@@ -90,7 +89,7 @@ class RecordService : Service() {
 
     fun startRecording() {
         val notificationManager = NotificationManagerCompat.from(this)
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
+        notificationManager.notify(RECORD_NOTIFICATION_ID, builder.build())
 
         /** 그대로 저장하면 용량이 크다.
          * 프레임 : 한 순간의 음성이 들어오면, 음성을 바이트 단위로 전부 저장하는 것

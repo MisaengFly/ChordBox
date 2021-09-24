@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.chord.ChordFragment
 import com.misaengfly.chordbox.databinding.FragmentRecentBoxBinding
+import com.misaengfly.chordbox.record.MusicRecordActivity
 
 class RecentBoxFragment : Fragment() {
 

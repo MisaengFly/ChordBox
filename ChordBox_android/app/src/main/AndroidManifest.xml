@@ -27,10 +27,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".AudioRecordTest"/>
-        <activity android:name=".MusicRecordActivity"/>
+        <activity android:name=".record.MusicRecordActivity"/>
 
         <service android:name=".record.RecordService"/>
-        <service android:name=".MusicService"/>
+        <service android:name=".PlayService"/>
     </application>
 
 </manifest>
