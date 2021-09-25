@@ -96,7 +96,7 @@ class PlayerVisualizer : BaseVisualizer {
         this.tickDuration = tickDuration
 
         // show five bars per second
-        this.tickPerBar = approximateBarDuration / (this.tickDuration)
+        //this.tickPerBar = approximateBarDuration / (this.tickDuration)
         this.barDuration = tickPerBar * this.tickDuration
 
         for (i in normalizedAmps.indices step tickPerBar) {

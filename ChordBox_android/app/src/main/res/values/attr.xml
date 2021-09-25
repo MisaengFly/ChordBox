@@ -9,5 +9,6 @@
         <attr name="approximateBarDuration" format="integer" />
         <attr name="maxAmp" format="float" />
         <attr name="tickMarkColor" format="color"/>
+        <attr name="tickMarkText" format="string"/>
     </declare-styleable>
 </resources>

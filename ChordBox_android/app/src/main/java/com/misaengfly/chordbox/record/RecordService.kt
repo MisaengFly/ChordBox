@@ -6,16 +6,19 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioFormat
 import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.misaengfly.chordbox.MainActivity
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.State
 import timber.log.Timber
 import java.io.IOException
+
 
 class RecordService : Service() {
 
@@ -99,7 +102,7 @@ class RecordService : Service() {
         recorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC) // 어디에서 음성 데이터를 받을 것인지
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4) // 압축 형식 설정
-            setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC) // 인코딩 방법 설정
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC) // 인코딩 방법 설정
             setAudioEncodingBitRate(384000)
             setAudioSamplingRate(44100)
             setOutputFile(filePath)

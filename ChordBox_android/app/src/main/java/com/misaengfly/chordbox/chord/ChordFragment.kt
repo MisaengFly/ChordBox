@@ -20,15 +20,10 @@ import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentChordBinding
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
-import linc.com.amplituda.Amplituda
-import linc.com.amplituda.AmplitudaResult
-import linc.com.amplituda.exceptions.AmplitudaException
-import linc.com.amplituda.exceptions.io.AmplitudaIOException
 import timber.log.Timber
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.*
 import kotlin.math.sqrt
 
 
@@ -114,7 +109,10 @@ class ChordFragment : Fragment() {
         initMusic()
         getDecode()
 
-        //initUI()
+        chordBinding.musicPlayBtn.setOnClickListener {
+            chordBinding.playerVisualizer.setWaveForm(decodeAmps, tickDuration)
+        }
+//        initUI()
     }
 
     private var channelCount: Int = 0
@@ -146,8 +144,8 @@ class ChordFragment : Fragment() {
             sampleRate, channelCount, bitPerSample
         )
 
-        tickDuration = format.getLong(MediaFormat.KEY_DURATION).toInt()
-        tickDuration = (bufferSize.toDouble() * 1000 / byteRate).toInt()
+        tickDuration = (format.getLong(MediaFormat.KEY_DURATION) / 1000 / 1000).toInt()
+//        tickDuration = (bufferSize.toDouble() * 1000 / byteRate).toInt()
     }
 
     /**
@@ -190,22 +188,8 @@ class ChordFragment : Fragment() {
         val amps = mutableListOf<Int>()
         val buffer = ByteArray(bufferSize)
 
-        val amplituda = Amplituda(context)
-        amplituda.processAudio("${requireContext().filesDir?.absolutePath}/musicrecord0.m4a")[
-                { result: AmplitudaResult<String?> ->
-//                    amps.addAll(result.amplitudesAsList())
-                    tickDuration =
-                        result.getAudioDuration(AmplitudaResult.DurationUnit.SECONDS).toInt()
-                    val source = result.audioSource
-                    val sourceType = result.inputAudioType
-                }, { exception: AmplitudaException? ->
-                    if (exception is AmplitudaIOException) {
-                        println("IO Exception!")
-                    }
-                }]
-
         File("${requireContext().filesDir?.absolutePath}/musicrecord0.m4a").inputStream().use {
-            it.skip(24.toLong())
+            it.skip(44.toLong())
 
             var count = it.read(buffer)
             while (count > 0) {
@@ -225,6 +209,18 @@ class ChordFragment : Fragment() {
                 .get(it)
             it.maxOrNull()?.toInt() ?: 0
         }
+    }
+
+    private fun ByteArray.getInt(): Int {
+        this.let {
+            if (this.size < 4) return 0
+            var result = this[3].toInt() and 0xFF
+            result = result or (this[2].toInt() shl 8 and 0xFF00)
+            result = result or (this[1].toInt() shl 16 and 0xFF0000)
+            result = result or (this[0].toInt() shl 24)
+            return result
+        }
+        return 0
     }
 
     // TODO()
@@ -249,8 +245,7 @@ class ChordFragment : Fragment() {
 
         // we get the parameter from the mediaFormat
         channelCount = mediaFormat!!.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-        sampleRate = mediaFormat!!.getInteger(MediaFormat.KEY_SAMPLE_RATE)*2
-        val duration = mediaFormat!!.getLong(MediaFormat.KEY_DURATION)
+        sampleRate = mediaFormat!!.getInteger(MediaFormat.KEY_SAMPLE_RATE) * 2
         val mimeType = mediaFormat!!.getString(MediaFormat.KEY_MIME)
 
         // we can get the minimum buffer size from audioTrack passing the parameter of the audio
@@ -263,15 +258,33 @@ class ChordFragment : Fragment() {
 
         // to reproduce the data we need to initialize the audioTrack, by passing the audio parameter
         // we use the MODE_STREAM so we can put more data dynamically with audioTrack.write()
-        var audioTrack = AudioTrack(
-            AudioManager.STREAM_MUSIC,
-            sampleRate,
-            AudioFormat.CHANNEL_OUT_STEREO,
-            AudioFormat.ENCODING_PCM_16BIT,
-            minBuffSize * 8,
-            AudioTrack.MODE_STREAM
-        )
+        val audioManager = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioSessionId = audioManager.generateAudioSessionId()
 
+//        var audioTrack = AudioTrack(
+//            AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
+//                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
+//            AudioFormat.Builder().setSampleRate(sampleRate)
+//                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+//                .build(),
+//            minBuffSize * 8,
+//            AudioTrack.MODE_STREAM,
+//            audioSessionId
+//        )
+
+        var audioTrack = AudioTrack(
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build(),
+            AudioFormat.Builder()
+                .setSampleRate(sampleRate)
+                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                .build(),
+            minBuffSize * 8,
+            AudioTrack.MODE_STATIC,
+            audioSessionId
+        )
 
         // we get the mediaCodec by creating it using the mime_type extracted form the track
         val decoder = MediaCodec.createDecoderByType(mimeType!!)
@@ -325,7 +338,7 @@ class ChordFragment : Fragment() {
                     outputBuffer.order(ByteOrder.LITTLE_ENDIAN)
 
                     val tempBuf = outputBuffer.duplicate()
-                    val byteArray = ByteArray(tempBuf.capacity())
+                    val byteArray = ByteArray(tempBuf.limit())
                     tempBuf.get(byteArray)
                     decodeAmps.add(byteArray.calculateAmplitude())
 
@@ -378,7 +391,8 @@ class ChordFragment : Fragment() {
         decoder.configure(mediaFormat, null, null, 0)
         decoder.start()
         // also we need to start the audioTrack.
-        audioTrack.play()
-
+        val byteBuffer = ByteArray(tickDuration * sampleRate)
+        audioTrack.write(byteBuffer, 0, byteBuffer.size)
+        //audioTrack.play()
     }
 }

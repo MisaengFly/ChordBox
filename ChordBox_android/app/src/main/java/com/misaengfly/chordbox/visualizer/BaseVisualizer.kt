@@ -59,6 +59,8 @@ open class BaseVisualizer : View {
     private lateinit var tickTimeMarkColor: Paint
     private var tickBarWidth = 1f
 
+    private lateinit var tickTimeMarkString: Paint
+
     private fun init() {
         backgroundBarPrimeColor = Paint() // 백그라운드에 그려질 Bar
         this.backgroundBarPrimeColor.color = context.getColorCompat(R.color.gray)
@@ -70,9 +72,13 @@ open class BaseVisualizer : View {
         this.loadedBarPrimeColor.strokeCap = Paint.Cap.ROUND
         this.loadedBarPrimeColor.strokeWidth = barWidth
 
-        tickTimeMarkColor = Paint()
+        tickTimeMarkColor = Paint() // 아래에 초 표시줄
         this.tickTimeMarkColor.color = context.getColorCompat(R.color.white)
         this.tickTimeMarkColor.strokeWidth = tickBarWidth
+
+        tickTimeMarkString = Paint()
+        this.tickTimeMarkString.color = context.getColorCompat(R.color.white)
+        this.tickTimeMarkString.textSize = 120f
     }
 
     private fun loadAttribute(context: Context, attrs: AttributeSet?) {
@@ -134,6 +140,12 @@ open class BaseVisualizer : View {
 
                 if (i % tick == 0) {
                     drawBottomBar(canvas, startX, getBarHeightAt(i).toInt(), getBaseLine())
+                    drawBottomNumber(
+                        canvas,
+                        startX,
+                        getBaseLine(),
+                        (i / tick).toString()
+                    )
                 }
             }
         }
@@ -142,7 +154,23 @@ open class BaseVisualizer : View {
 
     private fun drawBottomBar(canvas: Canvas, startX: Float, height: Int, baseLine: Int) {
         val bottom = baseLine * 2
-        canvas.drawLine(startX, bottom.toFloat(),startX, bottom.toFloat()-100f, tickTimeMarkColor)
+        canvas.drawLine(
+            startX,
+            bottom.toFloat(),
+            startX,
+            bottom.toFloat() - 100f,
+            tickTimeMarkColor
+        )
+    }
+
+    private fun drawBottomNumber(
+        canvas: Canvas,
+        startX: Float,
+        baseLine: Int,
+        number: String
+    ) {
+        val bottom = baseLine * 2
+        canvas.drawText(number, startX, bottom.toFloat() - 100f, tickTimeMarkString)
     }
 
     private fun drawStraightBar(canvas: Canvas, startX: Float, height: Int, baseLine: Int) {
