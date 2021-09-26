@@ -1,6 +1,18 @@
 package com.misaengfly.chordbox.visualizer
 
-class BaseVisualizer : View {
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.util.AttributeSet
+import android.view.View
+import com.misaengfly.chordbox.R
+import com.misaengfly.chordbox.record.dpToPx
+import com.misaengfly.chordbox.record.getColorCompat
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
+
+open class BaseVisualizer : View {
 
     constructor(context: Context?) : super(context) {
         init()
@@ -53,7 +65,7 @@ class BaseVisualizer : View {
         this.backgroundBarPrimeColor.strokeWidth = barWidth
 
         loadedBarPrimeColor = Paint()
-        this.loadedBarPrimeColor.color = context.getColorCompat(R.color.orange)
+        this.loadedBarPrimeColor.color = context.getColorCompat(R.color.colorSecondary)
         this.loadedBarPrimeColor.strokeCap = Paint.Cap.ROUND
         this.loadedBarPrimeColor.strokeWidth = barWidth
     }
@@ -61,28 +73,28 @@ class BaseVisualizer : View {
     private fun loadAttribute(context: Context, attrs: AttributeSet?) {
         val typedArray = context.theme.obtainStyledAttributes(
             attrs,
-            R.styleable.iiVisu, 0, 0
+            R.styleable.visualizer, 0, 0
         )
         try {
             spaceBetweenBar =
-                typedArray.getDimension(R.styleable.iiVisu_spaceBetweenBar, context.dpToPx(2f))
+                typedArray.getDimension(R.styleable.visualizer_spaceBetweenBar, context.dpToPx(2f))
             approximateBarDuration =
-                typedArray.getInt(R.styleable.iiVisu_approximateBarDuration, 50)
+                typedArray.getInt(R.styleable.visualizer_approximateBarDuration, 50)
 
-            barWidth = typedArray.getDimension(R.styleable.iiVisu_barWidth, 2f)
-            maxAmp = typedArray.getFloat(R.styleable.iiVisu_maxAmp, 50f)
+            barWidth = typedArray.getDimension(R.styleable.visualizer_barWidth, 2f)
+            maxAmp = typedArray.getFloat(R.styleable.visualizer_maxAmp, 50f)
 
             loadedBarPrimeColor.apply {
                 strokeWidth = barWidth
                 color = typedArray.getColor(
-                    R.styleable.iiVisu_loadedBarPrimeColor,
-                    context.getColorCompat(R.color.orange)
+                    R.styleable.visualizer_loadedBarPrimeColor,
+                    context.getColorCompat(R.color.colorSecondary)
                 )
             }
             backgroundBarPrimeColor.apply {
                 strokeWidth = barWidth
                 color = typedArray.getColor(
-                    R.styleable.iiVisu_backgroundBarPrimeColor,
+                    R.styleable.visualizer_backgroundBarPrimeColor,
                     context.getColorCompat(R.color.gray)
                 )
             }
