@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentMusicListBinding
+import com.misaengfly.chordbox.player.ChordFragment
 import com.misaengfly.chordbox.record.RecordActivity
 
 class MusicListFragment : Fragment() {
@@ -42,7 +43,7 @@ class MusicListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = MusicAdapter(MusicAdapter.MusicItemListener {
-
+            replaceFragment(ChordFragment())
         })
         androidViewModel.musicList.observe(viewLifecycleOwner, {
             adapter.data = it

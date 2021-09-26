@@ -2,9 +2,11 @@
 <layout>
 
     <data>
+
         <variable
             name="music"
             type="com.misaengfly.chordbox.musiclist.MusicItem" />
+
         <variable
             name="clickListener"
             type="com.misaengfly.chordbox.musiclist.MusicAdapter.MusicItemListener" />
@@ -17,6 +19,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:onClick="@{() -> clickListener.onClick(music)}"
         app:cardBackgroundColor="#262626"
         app:cardCornerRadius="10dp">
 

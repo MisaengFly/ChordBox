@@ -12,6 +12,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 const val WAVE_HEADER_SIZE = 44
+const val SEEK_OVER_AMOUNT = 5000
 
 val Context.recordFile: File
     get() {
