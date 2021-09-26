@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="music"
+            type="com.misaengfly.chordbox.musiclist.MusicItem" />
+        <variable
+            name="clickListener"
+            type="com.misaengfly.chordbox.musiclist.MusicAdapter.MusicItemListener" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="#262626"
+        app:cardCornerRadius="10dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp">
+
+            <TextView
+                android:id="@+id/music_title"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:contentDescription="Record Title"
+                android:gravity="center_vertical"
+                android:text="@{music.fileName}"
+                android:textColor="#E1DDDD"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/music_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:contentDescription="Record length"
+                android:gravity="center_vertical"
+                android:text="@{music.duration}"
+                android:textColor="#E1DDDD"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/music_title" />
+
+            <TextView
+                android:id="@+id/music_record_time"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:contentDescription="Record Time"
+                android:gravity="center_vertical"
+                android:text="@{music.lastModified}"
+                android:textColor="#E1DDDD"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/music_duration" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>
