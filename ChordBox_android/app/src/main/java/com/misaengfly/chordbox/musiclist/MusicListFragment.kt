@@ -43,7 +43,7 @@ class MusicListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = MusicAdapter(MusicAdapter.MusicItemListener {
-            replaceFragment(ChordFragment())
+            replaceFragment(ChordFragment(), it)
         })
         androidViewModel.musicList.observe(viewLifecycleOwner, {
             adapter.data = it
@@ -60,7 +60,11 @@ class MusicListFragment : Fragment() {
         androidViewModel.updateFiles()
     }
 
-    private fun replaceFragment(fragment: Fragment) {
+    private fun replaceFragment(fragment: Fragment, path: String) {
+        val bundle = Bundle()
+        bundle.putString("Path", path)
+        fragment.arguments = bundle
+
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null)

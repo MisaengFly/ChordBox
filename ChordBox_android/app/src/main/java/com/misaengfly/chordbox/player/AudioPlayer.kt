@@ -2,8 +2,13 @@ package com.misaengfly.chordbox.player
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.net.Uri
 import android.util.Log
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaExtractor
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.misaengfly.chordbox.record.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -13,6 +18,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import javax.sql.DataSource
 
 class AudioPlayer private constructor(context: Context) : Player.Listener {
 
@@ -35,10 +41,7 @@ class AudioPlayer private constructor(context: Context) : Player.Listener {
         }
     }
 
-    private lateinit var filePath: String
-    private val loadFile: File by lazy {
-        filePath.loadFile
-    }
+    private lateinit var loadFile: File
     private val bufferSize = Recorder.getInstance(context).bufferSize
 
     private lateinit var player: ExoPlayer
@@ -48,9 +51,15 @@ class AudioPlayer private constructor(context: Context) : Player.Listener {
             player.release()
         }
 
-        this.filePath = filePath
+        loadFile = filePath.loadFile
+
+        val mediaItem = MediaItem.fromUri(Uri.fromFile(filePath.loadFile))
+        val dataSourceFactory = DefaultDataSourceFactory(appContext, appContext.packageName)
+        val mediaSourceFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
+        val mediaSource = mediaSourceFactory.createMediaSource(mediaItem)
+
         player = SimpleExoPlayer.Builder(appContext).build().apply {
-            setMediaSource(loadFile.toMediaSource())
+            setMediaSource(mediaSource)
             prepare()
             addListener(this@AudioPlayer)
         }

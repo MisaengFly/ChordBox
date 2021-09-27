@@ -15,6 +15,8 @@ class ChordFragment : Fragment() {
     private var chordBinding: FragmentChordBinding? = null
     private lateinit var player: AudioPlayer
 
+    private lateinit var filePath: String
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -22,6 +24,9 @@ class ChordFragment : Fragment() {
     ): View? {
         val binding = FragmentChordBinding.inflate(inflater, container, false)
         chordBinding = binding
+
+        val bundle = arguments
+        filePath = bundle?.getString("Path").toString()
 
         return binding.root
     }
@@ -67,7 +72,7 @@ class ChordFragment : Fragment() {
 
     private fun listenOnPlayerStates() = with(chordBinding) {
         player = AudioPlayer.getInstance(requireContext())
-            .init("${requireContext().filesDir?.absolutePath}/musicrecord0.wav").apply {
+            .init(filePath).apply {
                 onProgress = { time, isPlaying -> updateTime(time, isPlaying) }
             }
     }

@@ -14,8 +14,8 @@ class MusicAdapter(private val clickListener: MusicItemListener) :
             notifyDataSetChanged()
         }
 
-    class MusicItemListener(private val clickListener: () -> Unit) {
-        fun onClick(music: MusicItem) = clickListener()
+    class MusicItemListener(private val clickListener: (filePath: String) -> Unit) {
+        fun onClick(music: MusicItem) = clickListener(music.absolutePath)
     }
 
     class ViewHolder private constructor(private val binding: ItemMusicListBinding) :
