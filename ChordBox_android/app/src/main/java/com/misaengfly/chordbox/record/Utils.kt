@@ -8,8 +8,16 @@ import android.view.WindowManager
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DataSpec
+import com.google.android.exoplayer2.upstream.FileDataSource
 
 const val WAVE_HEADER_SIZE = 44
 const val SEEK_OVER_AMOUNT = 5000
@@ -21,6 +29,16 @@ val Context.recordFile: File
         }?.size ?: 0
         return File(filesDir, "musicrecord${fileCount}.wav")
     }
+
+val String.loadFile: File
+    get() = File(this)
+
+fun File.toMediaSource(): MediaSource =
+    DataSpec(this.toUri())
+        .let { FileDataSource().apply { open(it) } }
+        .let { DataSource.Factory { it } }
+        .let { ProgressiveMediaSource.Factory(it, DefaultExtractorsFactory()) }
+        .createMediaSource(MediaItem.fromUri(this.toUri()))
 
 fun Long.formatAsTime(): String {
     val seconds = (TimeUnit.MILLISECONDS.toSeconds(this) % 60).toInt()

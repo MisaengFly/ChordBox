@@ -3,89 +3,103 @@ package com.misaengfly.chordbox.player
 import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
-import com.misaengfly.chordbox.record.Recorder
-import com.misaengfly.chordbox.record.SingletonHolder
+import com.google.android.exoplayer2.*
+import com.misaengfly.chordbox.record.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import java.io.File
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class AudioPlayer private constructor(context: Context) {
+class AudioPlayer private constructor(context: Context) : Player.Listener {
 
     private val appContext = context.applicationContext
 
     var onProgress: ((Long, Boolean) -> Unit)? = null
+    var onStart: (() -> Unit)? = null
+    var onStop: (() -> Unit)? = null
+    var onPause: (() -> Unit)? = null
+    var onResume: (() -> Unit)? = null
     val tickDuration = Recorder.getInstance(this.appContext).tickDuration
 
-    private var isPrepared = false
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    private var player: MediaPlayer? = null
+    private var loopingFlowJob: Job? = null
+    private var loopingFlow = flow {
+        while (true) {
+            emit(Unit)
+            delay(LOOP_DURATION)
+        }
+    }
+
+    private lateinit var filePath: String
+    private val loadFile: File by lazy {
+        filePath.loadFile
+    }
+    private val bufferSize = Recorder.getInstance(context).bufferSize
+
+    private lateinit var player: ExoPlayer
 
     fun init(filePath: String): AudioPlayer {
-        player?.release()
-        isPrepared = false
+        if (::player.isInitialized) {
+            player.release()
+        }
 
-        player = MediaPlayer().apply {
-            try {
-                setDataSource(filePath)
-                setOnPreparedListener {
-                    isPrepared = true
-                }
-                prepare()
-            } catch (e: IOException) {
-                Log.e("AudioPlayer", "prepare() failed")
-            }
+        this.filePath = filePath
+        player = SimpleExoPlayer.Builder(appContext).build().apply {
+            setMediaSource(loadFile.toMediaSource())
+            prepare()
+            addListener(this@AudioPlayer)
         }
         return this
     }
 
     fun togglePlay() {
-        if (!player!!.isPlaying) {
+        if (!player.isPlaying) {
             resume()
         } else {
             pause()
         }
     }
 
-    fun seekTo(time: Int) {
-        player?.seekTo(time)
+    fun seekTo(time: Long) {
+        player.seekTo(time)
     }
 
     fun resume() {
-        player?.start()
+        player.play()
         updateProgress()
+        onResume?.invoke()
     }
 
     fun pause() {
-        player?.pause()
+        player.pause()
         updateProgress()
+        onPause?.invoke()
     }
 
-    fun release() {
-        player?.release()
+    private fun updateProgress(position: Long = player.currentPosition) {
+        onProgress?.invoke(position, player.playWhenReady)
     }
 
-    private fun updateProgress(position: Int = player?.currentPosition ?: 0) {
-        onProgress?.invoke(position.toLong(), isPrepared)
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun loadAmps(): List<Int> = withContext(IO) {
+        val amps = mutableListOf<Int>()
+        val buffer = ByteArray(bufferSize)
+        File(loadFile.toString()).inputStream().use {
+            it.skip(WAVE_HEADER_SIZE.toLong())
+
+            var count = it.read(buffer)
+            while (count > 0) {
+                amps.add(buffer.calculateAmplitude())
+                count = it.read(buffer)
+            }
+        }
+        amps
     }
-//
-//    @Suppress("BlockingMethodInNonBlockingContext")
-//    suspend fun loadAmps(): List<Int> = withContext(IO) {
-//        val amps = mutableListOf<Int>()
-//        val buffer = ByteArray(bufferSize)
-//        File(recordFile.toString()).inputStream().use {
-//            it.skip(WAVE_HEADER_SIZE.toLong())
-//
-//            var count = it.read(buffer)
-//            while (count > 0) {
-//                amps.add(buffer.calculateAmplitude())
-//                count = it.read(buffer)
-//            }
-//        }
-//        amps
-//    }
 
     private fun ByteArray.calculateAmplitude(): Int {
         return ShortArray(size / 2).let {
@@ -97,10 +111,51 @@ class AudioPlayer private constructor(context: Context) {
         }
     }
 
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        super.onPlaybackStateChanged(playbackState)
+        when (playbackState) {
+            Player.STATE_ENDED -> {
+                updateProgress(player.duration)
+                onStop?.invoke()
+                reset()
+            }
+            Player.STATE_READY -> Unit
+            Player.STATE_BUFFERING -> Unit
+            Player.STATE_IDLE -> Unit
+        }
+    }
+
     private fun reset() {
-        player?.prepare()
-        player?.pause()
-        player?.seekTo(0)
+        player.prepare()
+        player.pause()
+        player.seekTo(0)
+    }
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        if (isPlaying) {
+            loopingFlowJob?.cancel()
+            loopingFlowJob = coroutineScope.launch {
+                loopingFlow.collect { updateProgress() }
+            }
+            onStart?.invoke()
+        } else {
+            loopingFlowJob?.cancel()
+        }
+    }
+
+    override fun onPlayerError(error: PlaybackException) {
+        super.onPlayerError(error)
+        Log.e(TAG, error.toString(), error)
+    }
+
+    fun release() {
+        player.release()
+        onProgress = null
+        onStart = null
+        onStop = null
+        onPause = null
+        onResume = null
     }
 
     companion object : SingletonHolder<AudioPlayer, Context>(::AudioPlayer) {
