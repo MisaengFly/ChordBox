@@ -23,7 +23,10 @@ class Recorder private constructor(context: Context) {
         }
 
     private var startTime: Long = 0
-    private val recordingConfig = WaveConfig()
+    private val recordingConfig = WaveConfig().apply {
+        sampleRate = 44100
+        audioEncoding = AudioFormat.ENCODING_PCM_16BIT
+    }
     private val appContext = context.applicationContext
     private lateinit var recorder: WaveRecorder
 
@@ -33,8 +36,8 @@ class Recorder private constructor(context: Context) {
         private set
 
     fun init(): Recorder {
-        recordingConfig.sampleRate = 44100
-        recordingConfig.audioEncoding = AudioFormat.ENCODING_PCM_16BIT
+//        recordingConfig.sampleRate = 44100
+//        recordingConfig.audioEncoding = AudioFormat.ENCODING_PCM_16BIT
         recorder = WaveRecorder(appContext.recordFile.toString())
             .apply { waveConfig = recordingConfig }
 
