@@ -76,7 +76,11 @@ class RecordActivity : AppCompatActivity() {
             }
             onStop = {
                 recordTimeView.text = 0L.formatAsTime()
-                StopDialog().show(supportFragmentManager, "StopDialog")
+                StopDialog().apply {
+                    arguments = Bundle().apply {
+                        putString("Path", recorder.filePath)
+                    }
+                }.show(supportFragmentManager, "StopDialog")
             }
             onPause = {
 

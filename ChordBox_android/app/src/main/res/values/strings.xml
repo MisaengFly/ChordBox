@@ -3,4 +3,8 @@
 
     <string name="no">No</string>
     <string name="yes">Yes</string>
+
+    <string name="file_name">File Name</string>
+    <string name="file_date">File Created Time</string>
+    <string name="file_progress">File Progress</string>
 </resources>

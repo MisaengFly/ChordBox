@@ -35,10 +35,13 @@ class Recorder private constructor(context: Context) {
     var isPaused = false
         private set
 
+    lateinit var filePath: String
+
     fun init(): Recorder {
 //        recordingConfig.sampleRate = 44100
 //        recordingConfig.audioEncoding = AudioFormat.ENCODING_PCM_16BIT
-        recorder = WaveRecorder(appContext.recordFile.toString())
+        filePath = appContext.recordFile.toString()
+        recorder = WaveRecorder(filePath)
             .apply { waveConfig = recordingConfig }
 
         recorder.onTimeElapsed
