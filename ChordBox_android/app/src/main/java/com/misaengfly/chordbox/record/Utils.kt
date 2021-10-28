@@ -18,6 +18,8 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.FileDataSource
+import java.text.SimpleDateFormat
+import java.util.*
 
 const val WAVE_HEADER_SIZE = 44
 const val SEEK_OVER_AMOUNT = 5000
@@ -39,6 +41,12 @@ fun File.toMediaSource(): MediaSource =
         .let { DataSource.Factory { it } }
         .let { ProgressiveMediaSource.Factory(it, DefaultExtractorsFactory()) }
         .createMediaSource(MediaItem.fromUri(this.toUri()))
+
+fun Long.convertLongToDateTime(): String {
+    val date = Date(this)
+    val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
+    return format.format(date)
+}
 
 fun Long.formatAsTime(): String {
     val seconds = (TimeUnit.MILLISECONDS.toSeconds(this) % 60).toInt()

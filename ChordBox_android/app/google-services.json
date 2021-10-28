@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "73898810384",
+    "project_id": "chordbox-d94a6",
+    "storage_bucket": "chordbox-d94a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73898810384:android:22e9608e7fbb32812d7e95",
+        "android_client_info": {
+          "package_name": "com.misaengfly.chordbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "73898810384-v3qbc7jj7iargaskeg0296ts4nfifmrh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.misaengfly.chordbox",
+            "certificate_hash": "fc67cb2a1e31cc4ab72cd0403bbe9f8ed8106f23"
+          }
+        },
+        {
+          "client_id": "73898810384-na3de4r1j35dddb1o8amhl1oe50k0g17.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEb1plttzOa-thWtw0_M1zzLRdYlWmp9I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "73898810384-na3de4r1j35dddb1o8amhl1oe50k0g17.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

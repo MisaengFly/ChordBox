@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.misaengfly.chordbox.databinding.FragmentChordBinding
 import com.misaengfly.chordbox.record.SEEK_OVER_AMOUNT
+import com.misaengfly.chordbox.record.convertLongToDateTime
+import java.io.File
 import kotlin.math.sqrt
 
 class ChordFragment : Fragment() {
@@ -28,6 +30,9 @@ class ChordFragment : Fragment() {
 
         val bundle = arguments
         filePath = bundle?.getString("Path").toString()
+
+        binding.musicNameTv.text = File(filePath).name
+        binding.musicDateTv.text = File(filePath).lastModified().convertLongToDateTime()
 
         return binding.root
     }

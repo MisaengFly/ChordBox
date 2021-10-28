@@ -4,14 +4,20 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.ActivityRecordBinding
 import com.misaengfly.chordbox.dialog.StopDialog
+import java.io.File
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
+private const val RECORDING = 0
+private const val PAUSE = 1
+private const val STOP = 2
 
 class RecordActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRecordBinding
@@ -49,24 +55,54 @@ class RecordActivity : AppCompatActivity() {
 
         // 버튼 이벤트 연결
         binding.recordBtn.setOnClickListener {
-            recorder.toggleRecording()
+            setButton(RECORDING)
         }
         binding.pauseBtn.setOnClickListener {
-            recorder.pauseRecording()
+            setButton(PAUSE)
         }
         binding.stopBtn.setOnClickListener {
-            recorder.stopRecording()
+            setButton(STOP)
         }
     }
 
     override fun onStart() {
         super.onStart()
         listenOnRecorderStates()
+        // File Name 보여주기
+        binding.recordFileNameTv.text = File(recorder.filePath).name
     }
 
     override fun onStop() {
         recorder.release()
         super.onStop()
+    }
+
+    private fun setButton(type: Int) {
+        when (type) {
+            RECORDING -> {
+                recorder.toggleRecording()
+                binding.recordBtn.visibility = GONE
+                binding.pauseBtn.visibility = VISIBLE
+                binding.stopBtn.visibility = VISIBLE
+            }
+            PAUSE -> {
+                binding.recordBtn.visibility = GONE
+                if (recorder.isRecording) {
+                    recorder.pauseRecording()
+                    binding.pauseBtn.setImageDrawable(getDrawable(R.drawable.ic_radio_checked))
+                }
+                else {
+                    recorder.toggleRecording()
+                    binding.pauseBtn.setImageDrawable(getDrawable(R.drawable.ic_pause))
+                }
+            }
+            STOP -> {
+                recorder.stopRecording()
+                binding.recordBtn.visibility = VISIBLE
+                binding.pauseBtn.visibility = GONE
+                binding.stopBtn.visibility = GONE
+            }
+        }
     }
 
     private fun listenOnRecorderStates() = with(binding) {
@@ -75,6 +111,7 @@ class RecordActivity : AppCompatActivity() {
 
             }
             onStop = {
+                recorderVisualizer.clear()
                 recordTimeView.text = 0L.formatAsTime()
                 StopDialog().apply {
                     arguments = Bundle().apply {
@@ -86,6 +123,11 @@ class RecordActivity : AppCompatActivity() {
 
             }
             onAmpListener = {
+                runOnUiThread {
+                    if (recorder.isRecording) {
+                        recorderVisualizer.addAmp(it, tickDuration)
+                    }
+                }
             }
             onTimeElapsed = {
                 runOnUiThread {

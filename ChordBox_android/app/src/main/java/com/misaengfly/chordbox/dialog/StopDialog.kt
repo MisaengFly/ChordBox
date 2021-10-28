@@ -39,9 +39,10 @@ class StopDialog : DialogFragment() {
         positiveButton = view.findViewById(R.id.yes_btn)
         negativeButton = view.findViewById(R.id.no_btn)
 
+        val filePath = arguments?.getString("Path")
+        val file = File(filePath)
+
         positiveButton.setOnClickListener {
-            val filePath = arguments?.getString("Path")
-            val file = File(filePath)
             val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
             val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
 
@@ -61,6 +62,7 @@ class StopDialog : DialogFragment() {
         }
         negativeButton.setOnClickListener {
             // 파일 삭제 하기
+            file.delete()
             dismiss()
         }
 

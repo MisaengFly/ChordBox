@@ -5,7 +5,9 @@ import android.media.MediaMetadataRetriever
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.misaengfly.chordbox.record.convertLongToDateTime
 import java.io.File
+import java.io.FileFilter
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -29,8 +31,10 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
      * 저장소에서 파일 불러와서 변환
      * */
     private fun getFileList(application: Application): ArrayList<MusicItem> {
-        // 파일 얻어오기
-        val fileList = application.filesDir.listFiles()
+        // 파일 얻어오기 - wav 확장자인 파일만 가능
+        val fileList = application.filesDir.listFiles(FileFilter {
+            it.extension == "wav"
+        })
         val musicItemList = arrayListOf<MusicItem>()
 
         for (file in fileList) {
@@ -39,7 +43,7 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
                     file.absolutePath,
                     file.name,
                     getFileDuration(file),
-                    convertLongToDateTime(file.lastModified())
+                    file.lastModified().convertLongToDateTime()
                 )
             )
         }
@@ -53,27 +57,22 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
         var durationString = ""
 
         val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(file.absolutePath)
-        val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        val timeInMilliSec = time!!.toLong()
-        val duration = timeInMilliSec / 1000
-        val hours = duration / 3600
-        val minutes = (duration - hours * 3600) / 60
-        val seconds = duration - (hours * 3600 + minutes * 60)
+        file.absolutePath.let {
+            retriever.setDataSource(file.absolutePath)
+            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            val timeInMilliSec = time!!.toLong()
+            val duration = timeInMilliSec / 1000
+            val hours = duration / 3600
+            val minutes = (duration - hours * 3600) / 60
+            val seconds = duration - (hours * 3600 + minutes * 60)
 
-        if (hours > 0) {
-            durationString += hours.toInt()
-            durationString += ":"
+            if (hours > 0) {
+                durationString += hours.toInt()
+                durationString += ":"
+            }
+            durationString += "${minutes.toInt()}:${seconds.toInt()}"
         }
-        durationString += "${minutes.toInt()}:${seconds.toInt()}"
-
         return durationString
-    }
-
-    private fun convertLongToDateTime(time: Long): String {
-        val date = Date(time)
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-        return format.format(date)
     }
 
     /**
