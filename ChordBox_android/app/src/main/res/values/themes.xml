@@ -16,4 +16,11 @@
         <item name="android:textColor">@color/text_color</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/selector_textinputlayout_outline</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="hintTextColor">@color/colorSecondary</item>
+        <item name="colorControlActivated">@color/colorSecondary</item>
+    </style>
 </resources>

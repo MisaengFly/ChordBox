@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentMusicListBinding
+import com.misaengfly.chordbox.dialog.SelectBottomSheet
 import com.misaengfly.chordbox.player.ChordFragment
 import com.misaengfly.chordbox.record.RecordActivity
 
@@ -51,7 +52,7 @@ class MusicListFragment : Fragment() {
         musicListBinding.musicListRV.adapter = adapter
 
         musicListBinding.newMusicFAB.setOnClickListener {
-            startActivity(Intent(requireContext(), RecordActivity::class.java))
+            SelectBottomSheet.newInstance().show(requireActivity().supportFragmentManager, "SelectBottomSheet")
         }
     }
 
