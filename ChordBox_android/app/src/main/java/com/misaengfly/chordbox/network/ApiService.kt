@@ -6,9 +6,7 @@ import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 
 private const val BASE_URL = "http://192.168.0.2"
 
@@ -23,8 +21,12 @@ private val retrofit = Retrofit.Builder()
 
 interface ApiService {
     @Multipart
-    @POST("/upload")
+    @POST("/uploadFile")
     fun sendAudioFile(@Part file: MultipartBody.Part): Call<FileResponse>
+
+    @FormUrlEncoded
+    @POST("/uploadUrl")
+    fun sendYoutubeUrl(@Field("url") url: String): Call<Unit>
 }
 
 object FileApi {

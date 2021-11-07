@@ -1,6 +1,5 @@
 package com.misaengfly.chordbox.musiclist
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentMusicListBinding
 import com.misaengfly.chordbox.dialog.SelectBottomSheet
 import com.misaengfly.chordbox.player.ChordFragment
-import com.misaengfly.chordbox.record.RecordActivity
 
 class MusicListFragment : Fragment() {
 
