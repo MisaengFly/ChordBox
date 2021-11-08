@@ -50,7 +50,8 @@ class MusicListFragment : Fragment() {
         musicListBinding.musicListRV.adapter = adapter
 
         musicListBinding.newMusicFAB.setOnClickListener {
-            SelectBottomSheet.newInstance().show(requireActivity().supportFragmentManager, "SelectBottomSheet")
+            SelectBottomSheet.newInstance()
+                .show(requireActivity().supportFragmentManager, "SelectBottomSheet")
         }
     }
 

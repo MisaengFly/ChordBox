@@ -53,12 +53,12 @@ class SendUrlBottomSheet : BottomSheetDialogFragment() {
             } else {
                 FileApi.retrofitService.sendYoutubeUrl(urlString.toString()).enqueue(object : Callback<Unit> {
                     override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                        Log.d("callback success : ", response.message())
+                        Log.d("Send URL cb success : ", response.message())
                         dismiss()
                     }
 
                     override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Log.d("callback failure", t.toString())
+                        Log.d("Send URL cb failure", t.toString())
                         dismiss()
                     }
                 })

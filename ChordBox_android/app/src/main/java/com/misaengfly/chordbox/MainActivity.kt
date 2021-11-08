@@ -13,6 +13,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.misaengfly.chordbox.musiclist.MusicListFragment
 
 class MainActivity : AppCompatActivity() {
@@ -22,6 +24,22 @@ class MainActivity : AppCompatActivity() {
             applicationContext.contentResolver,
             Settings.Secure.ANDROID_ID
         )
+    }
+
+    private fun getCurrentToken(){
+        val TAG = "Current Token"
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+            Log.d(TAG, token.toString())
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +60,8 @@ class MainActivity : AppCompatActivity() {
             }
             editor.commit()
         }
+
+        getCurrentToken()
 
         val musicListFragment = MusicListFragment()
         supportFragmentManager.beginTransaction()

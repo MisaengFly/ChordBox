@@ -7,4 +7,6 @@
     <string name="file_name">File Name</string>
     <string name="file_date">File Created Time</string>
     <string name="file_progress">File Progress</string>
+    
+    <string name="firebase_notification_channel_id">fb_notification_channel</string>
 </resources>
