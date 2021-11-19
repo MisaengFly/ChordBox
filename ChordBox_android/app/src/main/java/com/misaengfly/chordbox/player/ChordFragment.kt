@@ -1,15 +1,17 @@
 package com.misaengfly.chordbox.player
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.gson.GsonBuilder
+import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentChordBinding
 import com.misaengfly.chordbox.record.SEEK_OVER_AMOUNT
 import com.misaengfly.chordbox.record.convertLongToDateTime
+import org.json.JSONObject
 import java.io.File
 import kotlin.math.sqrt
 
@@ -34,7 +36,36 @@ class ChordFragment : Fragment() {
         binding.musicNameTv.text = File(filePath).name
         binding.musicDateTv.text = File(filePath).lastModified().convertLongToDateTime()
 
+        chordList = getChordList()
+        timeList = getTimeList()
+
         return binding.root
+    }
+
+    // assets에 있는 파일 읽기
+    private lateinit var chordList: List<String>
+    private lateinit var timeList: List<String>
+
+    fun getChordList(): List<String> {
+        val assetsManger = resources.assets
+        val inputStream = assetsManger.open("example.json")
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+        val jObject = JSONObject(jsonString)
+        val chordArray = jObject.getJSONArray("chordList").toString()
+
+        return GsonBuilder().create().fromJson(chordArray, Array<String>::class.java).toList()
+    }
+
+    fun getTimeList(): List<String> {
+        val assetsManger = resources.assets
+        val inputStream = assetsManger.open("example.json")
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+        val jObject = JSONObject(jsonString)
+        val timeArray = jObject.getJSONArray("timeList").toString()
+
+        return GsonBuilder().create().fromJson(timeArray, Array<String>::class.java).toList()
     }
 
     override fun onStart() {
@@ -66,20 +97,26 @@ class ChordFragment : Fragment() {
                 player.seekTo(time)
             }
         }
-        musicPlayBtn.setOnClickListener { player.togglePlay() }
+        musicPlayBtn.setOnClickListener {
+            player.togglePlay()
+            // 땜방
+            musicPlayBtn.setImageResource(R.drawable.ic_stop)
+        }
         musicForwardBtn.setOnClickListener { playerVisualizer.seekOver(SEEK_OVER_AMOUNT) }
         musicBackwardBtn.setOnClickListener { playerVisualizer.seekOver(-SEEK_OVER_AMOUNT) }
 
         lifecycleScope.launchWhenCreated {
             val amps = player.loadAmps()
-            playerVisualizer.setWaveForm(amps, player.tickDuration)
+            playerVisualizer.setWaveForm(amps, player.tickDuration, chordList)
         }
     }
 
     private fun listenOnPlayerStates() = with(chordBinding) {
         player = AudioPlayer.getInstance(requireContext())
             .init(filePath).apply {
-                onProgress = { time, isPlaying -> updateTime(time, isPlaying) }
+                onProgress = { time, isPlaying ->
+                    updateTime(time, isPlaying)
+                }
             }
     }
 

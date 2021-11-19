@@ -6,7 +6,9 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
+import com.misaengfly.chordbox.record.getTime
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -20,13 +22,11 @@ class PlayerVisualizer : BaseVisualizer {
         attrs: AttributeSet?
     ) : super(context, attrs)
 
-
     constructor(
         context: Context,
         attrs: AttributeSet?,
         defStyleAttr: Int,
     ) : super(context, attrs, defStyleAttr)
-
 
     var onStartSeeking: (() -> Unit)? = null
     var onSeeking: ((Long) -> Unit)? = null
@@ -89,8 +89,11 @@ class PlayerVisualizer : BaseVisualizer {
         }
     }
 
-    fun setWaveForm(amps: List<Int>, tickDuration: Int) {
+    fun setWaveForm(amps: List<Int>, tickDuration: Int, chords: List<String>) {
         val normalizedAmps = amps.map(ampNormalizer)
+
+        this.chordDrawList = chords
+        this.timeStampDrawable = true
 
         this.amps.clear()
         this.tickDuration = tickDuration
@@ -117,6 +120,7 @@ class PlayerVisualizer : BaseVisualizer {
     fun updateTime(currentTime: Long, isPlaying: Boolean) {
         this.isPlaying = isPlaying
         this.cursorPosition = calculateCursorPosition(currentTime)
+        this.bottomStartIdx = currentTime.getTime()
         invalidate()
     }
 

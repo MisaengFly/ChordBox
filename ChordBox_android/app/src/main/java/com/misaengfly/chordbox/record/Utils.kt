@@ -58,6 +58,14 @@ fun Long.formatAsTime(): String {
     }
 }
 
+fun Long.getTime(): Int {
+    val seconds = (TimeUnit.MILLISECONDS.toSeconds(this) % 60).toInt()
+    val minutes = (TimeUnit.MILLISECONDS.toMinutes(this) % 60).toInt()
+    val hours = (TimeUnit.MILLISECONDS.toHours(this)).toInt()
+
+    return (hours * 3600 + minutes * 60 + seconds)
+}
+
 fun Context.getDrawableCompat(@DrawableRes resId: Int) =
     ContextCompat.getDrawable(this, resId)
 

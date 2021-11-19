@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.record.dpToPx
@@ -58,6 +59,18 @@ open class BaseVisualizer : View {
     private lateinit var loadedBarPrimeColor: Paint
     private lateinit var backgroundBarPrimeColor: Paint
 
+    /**
+     * 코드 그리기 위해 필요한 프로퍼티
+     **/
+    private lateinit var bottomBarPaint: Paint
+    private lateinit var bottomTextPaint: Paint
+    private var bottomIdx: Int = 0
+    private var bottomMaxValue: Int = Int.MAX_VALUE
+
+    protected var bottomStartIdx: Int = 0
+    protected var timeStampDrawable: Boolean = false
+    protected lateinit var chordDrawList: List<String>
+
     private fun init() {
         backgroundBarPrimeColor = Paint()
         this.backgroundBarPrimeColor.color = context.getColorCompat(R.color.gray)
@@ -68,6 +81,17 @@ open class BaseVisualizer : View {
         this.loadedBarPrimeColor.color = context.getColorCompat(R.color.colorSecondary)
         this.loadedBarPrimeColor.strokeCap = Paint.Cap.ROUND
         this.loadedBarPrimeColor.strokeWidth = barWidth
+
+        bottomBarPaint = Paint()
+        this.bottomBarPaint.color = context.getColorCompat(R.color.white)
+        this.bottomBarPaint.strokeWidth = barWidth
+
+        bottomTextPaint = Paint()
+        this.bottomTextPaint.color = context.getColorCompat(R.color.white)
+        this.bottomTextPaint.textSize = 90f
+
+        bottomIdx = 0
+        bottomStartIdx = 0
     }
 
     private fun loadAttribute(context: Context, attrs: AttributeSet?) {
@@ -109,9 +133,65 @@ open class BaseVisualizer : View {
 
     override fun onDraw(canvas: Canvas) {
         if (amps.isNotEmpty()) {
+            bottomIdx = bottomStartIdx
+            bottomStartIdx = bottomMaxValue
+
+            val drawCheck = Array((getEndBar() / 40 + 1)) { false }
+
             for (i in getStartBar() until getEndBar()) {
                 val startX = width / 2 - (getBarPosition() - i) * (barWidth + spaceBetweenBar)
                 drawStraightBar(canvas, startX, getBarHeightAt(i).toInt(), getBaseLine())
+
+                Log.i("Log", "tick : ${i}")
+//                if (timeStampDrawable && ((i % tickDuration) == 0)) {
+//                    val timeBaseLine = (getBaseLine() * 2).toFloat()
+//                    canvas.drawLine(
+//                        startX,
+//                        timeBaseLine,
+//                        startX,
+//                        timeBaseLine - 50f,
+//                        bottomBarPaint
+//                    )
+//
+//                    bottomStartIdx = min((i / tickDuration), bottomStartIdx)
+//                    if (bottomIdx < chordDrawList.size) {
+//                        canvas.drawText(
+//                            chordDrawList[bottomIdx],
+//                            startX,
+//                            timeBaseLine - 50f,
+//                            bottomTextPaint
+//                        )
+//                        ++bottomIdx
+//                    }
+//                }
+
+                if (timeStampDrawable && !drawCheck[(i/tickDuration)]) {
+                    if ((i % tickDuration) > 2) {
+                        drawCheck[(i/tickDuration)] = true
+                        continue
+                    }
+
+                    bottomIdx = (i/tickDuration)
+                    val timeBaseLine = (getBaseLine() * 2).toFloat()
+                    canvas.drawLine(
+                        startX,
+                        timeBaseLine,
+                        startX,
+                        timeBaseLine - 50f,
+                        bottomBarPaint
+                    )
+
+                    bottomStartIdx = min((i / tickDuration), bottomStartIdx)
+                    if (bottomIdx < chordDrawList.size) {
+                        canvas.drawText(
+                            chordDrawList[bottomIdx],
+                            startX,
+                            timeBaseLine - 50f,
+                            bottomTextPaint
+                        )
+                    }
+                    drawCheck[bottomIdx] = true
+                }
             }
         }
         super.onDraw(canvas)

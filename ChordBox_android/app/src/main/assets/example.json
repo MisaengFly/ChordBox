@@ -1,0 +1,5 @@
+{
+  "id": "fixyou",
+  "chordList": ["Cmaj", "Emin", "Amin", "Gmaj", "Cmaj", "Emin", "Amin", "Gmaj", "Cmaj", "Emin", "Amin", "Gmaj", "Cmaj", "Emin", "Amin"],
+  "timeList": [0, 2, 4, 6, 8, 10, 11, 13, 15, 17, 18, 21, 22, 24, 26]
+}

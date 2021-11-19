@@ -63,6 +63,7 @@
         android:layout_marginBottom="32dp"
         android:background="@null"
         android:src="@drawable/ic_play"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/music_forward_btn"
         app:layout_constraintStart_toEndOf="@+id/music_backward_btn" />
