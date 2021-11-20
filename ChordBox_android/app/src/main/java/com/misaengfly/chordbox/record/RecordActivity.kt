@@ -72,6 +72,16 @@ class RecordActivity : AppCompatActivity() {
         binding.recordFileNameTv.text = File(recorder.filePath).name
     }
 
+    /**
+     * recording 중에 앱 죵료시 녹음 자동 종료 + 파일 삭제
+     * */
+    override fun onPause() {
+        if (recorder.isRecording) {
+            recorder.forcedStopRecording()
+        }
+        super.onPause()
+    }
+
     override fun onStop() {
         recorder.release()
         super.onStop()
@@ -135,6 +145,11 @@ class RecordActivity : AppCompatActivity() {
                         recordTimeView.text = (it*1000).formatAsTime()
                     }
                 }
+            }
+            onForcedStop = {
+                File(recorder.filePath).delete()
+                recorderVisualizer.clear()
+                recordTimeView.text = 0L.formatAsTime()
             }
         }
     }

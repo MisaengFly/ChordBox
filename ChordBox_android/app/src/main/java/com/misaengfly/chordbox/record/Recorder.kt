@@ -22,6 +22,9 @@ class Recorder private constructor(context: Context) {
             field = value
         }
 
+    // 녹음 중 화면 이탈 시 호출
+    var onForcedStop: (() -> Unit)? = null
+
     private var startTime: Long = 0
     private val recordingConfig = WaveConfig().apply {
         sampleRate = 44100
@@ -83,6 +86,13 @@ class Recorder private constructor(context: Context) {
         onStop?.invoke()
     }
 
+    fun forcedStopRecording() {
+        recorder.stopRecording()
+        isPaused = false
+        isRecording = false
+        onForcedStop?.invoke()
+    }
+
     fun getCurrentTime() = System.currentTimeMillis() - startTime
 
     val bufferSize: Int
@@ -114,6 +124,7 @@ class Recorder private constructor(context: Context) {
         onPause = null
         recorder.onAmplitudeListener = null
         recorder.onTimeElapsed = null
+        onForcedStop = null
     }
 
     companion object : SingletonHolder<Recorder, Context>(::Recorder)

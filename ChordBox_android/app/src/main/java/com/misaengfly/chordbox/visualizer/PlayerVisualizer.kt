@@ -6,9 +6,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
-import com.misaengfly.chordbox.record.getTime
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -120,7 +118,6 @@ class PlayerVisualizer : BaseVisualizer {
     fun updateTime(currentTime: Long, isPlaying: Boolean) {
         this.isPlaying = isPlaying
         this.cursorPosition = calculateCursorPosition(currentTime)
-        this.bottomStartIdx = currentTime.getTime()
         invalidate()
     }
 

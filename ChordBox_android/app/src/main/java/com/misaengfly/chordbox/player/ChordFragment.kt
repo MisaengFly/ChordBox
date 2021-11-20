@@ -46,7 +46,7 @@ class ChordFragment : Fragment() {
     private lateinit var chordList: List<String>
     private lateinit var timeList: List<String>
 
-    fun getChordList(): List<String> {
+    private fun getChordList(): List<String> {
         val assetsManger = resources.assets
         val inputStream = assetsManger.open("example.json")
         val jsonString = inputStream.bufferedReader().use { it.readText() }
@@ -57,7 +57,7 @@ class ChordFragment : Fragment() {
         return GsonBuilder().create().fromJson(chordArray, Array<String>::class.java).toList()
     }
 
-    fun getTimeList(): List<String> {
+    private fun getTimeList(): List<String> {
         val assetsManger = resources.assets
         val inputStream = assetsManger.open("example.json")
         val jsonString = inputStream.bufferedReader().use { it.readText() }

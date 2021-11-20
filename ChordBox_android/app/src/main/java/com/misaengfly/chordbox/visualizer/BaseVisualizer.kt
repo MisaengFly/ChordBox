@@ -65,9 +65,7 @@ open class BaseVisualizer : View {
     private lateinit var bottomBarPaint: Paint
     private lateinit var bottomTextPaint: Paint
     private var bottomIdx: Int = 0
-    private var bottomMaxValue: Int = Int.MAX_VALUE
 
-    protected var bottomStartIdx: Int = 0
     protected var timeStampDrawable: Boolean = false
     protected lateinit var chordDrawList: List<String>
 
@@ -91,7 +89,6 @@ open class BaseVisualizer : View {
         this.bottomTextPaint.textSize = 90f
 
         bottomIdx = 0
-        bottomStartIdx = 0
     }
 
     private fun loadAttribute(context: Context, attrs: AttributeSet?) {
@@ -133,37 +130,13 @@ open class BaseVisualizer : View {
 
     override fun onDraw(canvas: Canvas) {
         if (amps.isNotEmpty()) {
-            bottomIdx = bottomStartIdx
-            bottomStartIdx = bottomMaxValue
 
+            // 그려줘야 할 코드 체크하는 용도
             val drawCheck = Array((getEndBar() / 40 + 1)) { false }
 
             for (i in getStartBar() until getEndBar()) {
                 val startX = width / 2 - (getBarPosition() - i) * (barWidth + spaceBetweenBar)
                 drawStraightBar(canvas, startX, getBarHeightAt(i).toInt(), getBaseLine())
-
-                Log.i("Log", "tick : ${i}")
-//                if (timeStampDrawable && ((i % tickDuration) == 0)) {
-//                    val timeBaseLine = (getBaseLine() * 2).toFloat()
-//                    canvas.drawLine(
-//                        startX,
-//                        timeBaseLine,
-//                        startX,
-//                        timeBaseLine - 50f,
-//                        bottomBarPaint
-//                    )
-//
-//                    bottomStartIdx = min((i / tickDuration), bottomStartIdx)
-//                    if (bottomIdx < chordDrawList.size) {
-//                        canvas.drawText(
-//                            chordDrawList[bottomIdx],
-//                            startX,
-//                            timeBaseLine - 50f,
-//                            bottomTextPaint
-//                        )
-//                        ++bottomIdx
-//                    }
-//                }
 
                 if (timeStampDrawable && !drawCheck[(i/tickDuration)]) {
                     if ((i % tickDuration) > 2) {
@@ -181,7 +154,6 @@ open class BaseVisualizer : View {
                         bottomBarPaint
                     )
 
-                    bottomStartIdx = min((i / tickDuration), bottomStartIdx)
                     if (bottomIdx < chordDrawList.size) {
                         canvas.drawText(
                             chordDrawList[bottomIdx],
