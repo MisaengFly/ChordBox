@@ -27,6 +27,11 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
         _musicList.postValue(getFileList(mApplication))
     }
 
+    fun removeFile(filePath: String) {
+        File(filePath).delete()
+        updateFiles()
+    }
+
     /**
      * 저장소에서 파일 불러와서 변환
      * */
