@@ -12,7 +12,6 @@ class  RecorderVisualizer : BaseVisualizer {
         attrs: AttributeSet?,
     ) : super(context, attrs)
 
-
     constructor(
         context: Context,
         attrs: AttributeSet?,
@@ -20,6 +19,7 @@ class  RecorderVisualizer : BaseVisualizer {
     ) : super(context, attrs, defStyleAttr)
 
     private val tempAmps = mutableListOf<Int>()
+
     fun addAmp(amp: Int, tickDuration: Int) {
         this.tickDuration = tickDuration
         this.tickPerBar = approximateBarDuration / (this.tickDuration)
