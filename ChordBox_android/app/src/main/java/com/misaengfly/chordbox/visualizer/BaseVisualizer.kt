@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.record.dpToPx
@@ -67,7 +66,7 @@ open class BaseVisualizer : View {
     private var bottomIdx: Int = 0
 
     protected var timeStampDrawable: Boolean = false
-    protected lateinit var chordDrawList: List<String>
+    protected lateinit var chordDrawMap: Map<Int, String>
 
     private fun init() {
         backgroundBarPrimeColor = Paint()
@@ -139,6 +138,7 @@ open class BaseVisualizer : View {
                 drawStraightBar(canvas, startX, getBarHeightAt(i).toInt(), getBaseLine())
 
                 if (timeStampDrawable && !drawCheck[(i/tickDuration)]) {
+                    // 코드 뒤로 밀리는것 방지
                     if ((i % tickDuration) > 2) {
                         drawCheck[(i/tickDuration)] = true
                         continue
@@ -154,11 +154,11 @@ open class BaseVisualizer : View {
                         bottomBarPaint
                     )
 
-                    if (bottomIdx < chordDrawList.size) {
+                    if (chordDrawMap.containsKey(bottomIdx)) {
                         canvas.drawText(
-                            chordDrawList[bottomIdx],
-                            startX,
-                            timeBaseLine - 50f,
+                            chordDrawMap[bottomIdx]!!,
+                            startX - 50f,
+                            timeBaseLine - 60f,
                             bottomTextPaint
                         )
                     }

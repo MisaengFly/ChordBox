@@ -87,10 +87,10 @@ class PlayerVisualizer : BaseVisualizer {
         }
     }
 
-    fun setWaveForm(amps: List<Int>, tickDuration: Int, chords: List<String>) {
+    fun setWaveForm(amps: List<Int>, tickDuration: Int, chords: Map<Int, String>) {
         val normalizedAmps = amps.map(ampNormalizer)
 
-        this.chordDrawList = chords
+        this.chordDrawMap = chords
         this.timeStampDrawable = true
 
         this.amps.clear()

@@ -39,12 +39,18 @@ class ChordFragment : Fragment() {
         chordList = getChordList()
         timeList = getTimeList()
 
+        for (i in chordList.indices) {
+            chordMap[timeList[i].toInt()] = chordList[i]
+        }
+
         return binding.root
     }
 
     // assets에 있는 파일 읽기
     private lateinit var chordList: List<String>
     private lateinit var timeList: List<String>
+
+    private var chordMap: MutableMap<Int, String> = mutableMapOf()
 
     private fun getChordList(): List<String> {
         val assetsManger = resources.assets
@@ -107,7 +113,7 @@ class ChordFragment : Fragment() {
 
         lifecycleScope.launchWhenCreated {
             val amps = player.loadAmps()
-            playerVisualizer.setWaveForm(amps, player.tickDuration, chordList)
+            playerVisualizer.setWaveForm(amps, player.tickDuration, chordMap.toMap())
         }
     }
 
