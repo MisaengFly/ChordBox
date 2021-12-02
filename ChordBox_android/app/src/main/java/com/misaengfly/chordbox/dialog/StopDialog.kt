@@ -1,9 +1,9 @@
 package com.misaengfly.chordbox.dialog
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,20 +11,29 @@ import android.view.Window
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.misaengfly.chordbox.R
-import com.misaengfly.chordbox.network.ApiService
-import com.misaengfly.chordbox.network.FileApi
-import com.misaengfly.chordbox.network.FileResponse
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.File
 
 class StopDialog : DialogFragment() {
+    private lateinit var listener: StopDialogListener
+
+    interface StopDialogListener {
+        fun onDialogPositiveClick(dialog: DialogFragment)
+        fun onDialogNegativeClick(dialog: DialogFragment)
+    }
+
     private lateinit var positiveButton: TextView
     private lateinit var negativeButton: TextView
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            listener = context as StopDialogListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException(
+                (context.toString() +
+                        " must implement NoticeDialogListener")
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,31 +48,11 @@ class StopDialog : DialogFragment() {
         positiveButton = view.findViewById(R.id.yes_btn)
         negativeButton = view.findViewById(R.id.no_btn)
 
-        val filePath = arguments?.getString("Path")
-        val file = File(filePath)
-
         positiveButton.setOnClickListener {
-            val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-            val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
-
-            FileApi.retrofitService.sendAudioFile(body).enqueue(object : Callback<FileResponse>{
-                override fun onResponse(
-                    call: Call<FileResponse>,
-                    response: Response<FileResponse>
-                ) {
-                    Log.d("callback success : ", response.message())
-                }
-
-                override fun onFailure(call: Call<FileResponse>, t: Throwable) {
-                    Log.d("callback failure", t.toString())
-                }
-            })
-            dismiss()
+            listener.onDialogPositiveClick(this)
         }
         negativeButton.setOnClickListener {
-            // 파일 삭제 하기
-            file.delete()
-            dismiss()
+            listener.onDialogNegativeClick(this)
         }
 
         return view

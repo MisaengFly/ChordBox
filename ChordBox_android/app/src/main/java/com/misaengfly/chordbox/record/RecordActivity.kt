@@ -7,8 +7,10 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.DialogFragment
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.ActivityRecordBinding
 import com.misaengfly.chordbox.dialog.StopDialog
@@ -19,7 +21,7 @@ private const val RECORDING = 0
 private const val PAUSE = 1
 private const val STOP = 2
 
-class RecordActivity : AppCompatActivity() {
+class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
     private lateinit var binding: ActivityRecordBinding
     private lateinit var recorder: Recorder
 
@@ -42,6 +44,41 @@ class RecordActivity : AppCompatActivity() {
             false
         }
         if (!permissionToRecordAccepted) finish()
+    }
+
+    /**
+     * Record Stop And Save Dialog
+     **/
+    private fun showSaveDialog() {
+        val dialog = StopDialog()
+        dialog.show(supportFragmentManager, "StopDialog")
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment) {
+//        val file = File(recorder.filePath)
+//            val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+//            val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
+//
+//            // 서버로 전송
+//            FileApi.retrofitService.sendAudioFile(body).enqueue(object : Callback<FileResponse> {
+//                override fun onResponse(
+//                    call: Call<FileResponse>,
+//                    response: Response<FileResponse>
+//                ) {
+//                    Log.d("callback success : ", response.message())
+//                }
+//
+//                override fun onFailure(call: Call<FileResponse>, t: Throwable) {
+//                    Log.d("callback failure", t.toString())
+//                }
+//            })
+//            dismiss()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+//            // 파일 삭제 하기
+//            file.delete()
+//            dismiss()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,8 +137,7 @@ class RecordActivity : AppCompatActivity() {
                 if (recorder.isRecording) {
                     recorder.pauseRecording()
                     binding.pauseBtn.setImageDrawable(getDrawable(R.drawable.ic_radio_checked))
-                }
-                else {
+                } else {
                     recorder.toggleRecording()
                     binding.pauseBtn.setImageDrawable(getDrawable(R.drawable.ic_pause))
                 }
@@ -123,11 +159,7 @@ class RecordActivity : AppCompatActivity() {
             onStop = {
                 recorderVisualizer.clear()
                 recordTimeView.text = 0L.formatAsTime()
-                StopDialog().apply {
-                    arguments = Bundle().apply {
-                        putString("Path", recorder.filePath)
-                    }
-                }.show(supportFragmentManager, "StopDialog")
+                showSaveDialog()
             }
             onPause = {
 
@@ -142,7 +174,7 @@ class RecordActivity : AppCompatActivity() {
             onTimeElapsed = {
                 runOnUiThread {
                     if (recorder.isRecording) {
-                        recordTimeView.text = (it*1000).formatAsTime()
+                        recordTimeView.text = (it * 1000).formatAsTime()
                     }
                 }
             }

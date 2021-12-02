@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.GsonBuilder
 import com.misaengfly.chordbox.R
+import com.misaengfly.chordbox.ReadAssets
 import com.misaengfly.chordbox.databinding.FragmentChordBinding
 import com.misaengfly.chordbox.record.SEEK_OVER_AMOUNT
 import com.misaengfly.chordbox.record.convertLongToDateTime
@@ -36,42 +37,7 @@ class ChordFragment : Fragment() {
         binding.musicNameTv.text = File(filePath).name
         binding.musicDateTv.text = File(filePath).lastModified().convertLongToDateTime()
 
-        chordList = getChordList()
-        timeList = getTimeList()
-
-        for (i in chordList.indices) {
-            chordMap[timeList[i].toInt()] = chordList[i]
-        }
-
         return binding.root
-    }
-
-    // assets에 있는 파일 읽기
-    private lateinit var chordList: List<String>
-    private lateinit var timeList: List<String>
-
-    private var chordMap: MutableMap<Int, String> = mutableMapOf()
-
-    private fun getChordList(): List<String> {
-        val assetsManger = resources.assets
-        val inputStream = assetsManger.open("example.json")
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
-
-        val jObject = JSONObject(jsonString)
-        val chordArray = jObject.getJSONArray("chordList").toString()
-
-        return GsonBuilder().create().fromJson(chordArray, Array<String>::class.java).toList()
-    }
-
-    private fun getTimeList(): List<String> {
-        val assetsManger = resources.assets
-        val inputStream = assetsManger.open("example.json")
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
-
-        val jObject = JSONObject(jsonString)
-        val timeArray = jObject.getJSONArray("timeList").toString()
-
-        return GsonBuilder().create().fromJson(timeArray, Array<String>::class.java).toList()
     }
 
     override fun onStart() {
@@ -113,7 +79,8 @@ class ChordFragment : Fragment() {
 
         lifecycleScope.launchWhenCreated {
             val amps = player.loadAmps()
-            playerVisualizer.setWaveForm(amps, player.tickDuration, chordMap.toMap())
+            val chordMap = ReadAssets().makeChordMap(resources)
+            playerVisualizer.setWaveForm(amps, player.tickDuration, chordMap)
         }
     }
 
