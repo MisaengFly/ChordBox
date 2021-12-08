@@ -3,17 +3,26 @@ package com.misaengfly.chordbox.record
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.RadioButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.ActivityRecordBinding
 import com.misaengfly.chordbox.dialog.StopDialog
+import com.misaengfly.chordbox.network.FileApi
+import com.misaengfly.chordbox.network.FileResponse
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -55,30 +64,36 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
     }
 
     override fun onDialogPositiveClick(dialog: DialogFragment) {
-//        val file = File(recorder.filePath)
-//            val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-//            val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
-//
-//            // 서버로 전송
-//            FileApi.retrofitService.sendAudioFile(body).enqueue(object : Callback<FileResponse> {
-//                override fun onResponse(
-//                    call: Call<FileResponse>,
-//                    response: Response<FileResponse>
-//                ) {
-//                    Log.d("callback success : ", response.message())
-//                }
-//
-//                override fun onFailure(call: Call<FileResponse>, t: Throwable) {
-//                    Log.d("callback failure", t.toString())
-//                }
-//            })
-//            dismiss()
+        val file = File(recorder.filePath)
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
+
+        // 서버로 전송
+        FileApi.retrofitService.sendAudioFile(body).enqueue(object : Callback<FileResponse> {
+            override fun onResponse(
+                call: Call<FileResponse>,
+                response: Response<FileResponse>
+            ) {
+                Log.d("callback success : ", response.message())
+            }
+
+            override fun onFailure(call: Call<FileResponse>, t: Throwable) {
+                Log.d("callback failure", t.toString())
+            }
+        })
+        dialog.dismiss()
+
+        // 알림창 보여주기
+        val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet_info, null)
+        val bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
     }
 
     override fun onDialogNegativeClick(dialog: DialogFragment) {
-//            // 파일 삭제 하기
-//            file.delete()
-//            dismiss()
+        // 파일 삭제 하기
+        File(recorder.filePath).delete()
+        dialog.dismiss()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
