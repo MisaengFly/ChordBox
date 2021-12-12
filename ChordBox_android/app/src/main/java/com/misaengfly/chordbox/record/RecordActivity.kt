@@ -11,8 +11,11 @@ import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.misaengfly.chordbox.R
+import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.databinding.ActivityRecordBinding
 import com.misaengfly.chordbox.dialog.StopDialog
 import com.misaengfly.chordbox.network.FileApi
@@ -33,6 +36,12 @@ private const val STOP = 2
 class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
     private lateinit var binding: ActivityRecordBinding
     private lateinit var recorder: Recorder
+
+    private val viewModel: RecordViewModel by lazy {
+        val dataSource = ChordDatabase.getInstance(this.application).recordDao
+        val viewModelFactory = RecordViewModelFactory(dataSource, this.application)
+        ViewModelProvider(this, viewModelFactory).get(RecordViewModel::class.java)
+    }
 
     /**
      * 퍼미션 요청
@@ -67,6 +76,9 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
         val file = File(recorder.filePath)
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
         val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
+
+        // DB에 저장
+        viewModel.insertRecord(file.absolutePath, file.name)
 
         // 서버로 전송
         FileApi.retrofitService.sendAudioFile(body).enqueue(object : Callback<FileResponse> {

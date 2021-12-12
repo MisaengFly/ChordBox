@@ -49,6 +49,10 @@ class ChordFirebaseMessagingService : FirebaseMessagingService() {
 
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+        val fileName = body.split(" ")
+        intent.putExtra("Notification", fileName[0])
+
         val pendingIntent =
             PendingIntent.getActivity(this, notifyId, intent, PendingIntent.FLAG_ONE_SHOT)
 

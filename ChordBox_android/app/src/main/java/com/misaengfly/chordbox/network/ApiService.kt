@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
-private const val BASE_URL = "http://192.168.0.2"
+private const val BASE_URL = "http://35.193.88.18:3333"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -27,6 +27,10 @@ interface ApiService {
     @FormUrlEncoded
     @POST("/uploadUrl")
     fun sendYoutubeUrl(@Field("url") url: String): Call<Unit>
+
+    @FormUrlEncoded
+    @POST("/fileChord")
+    fun getRecordChord(@Field("file_name") fileName: String): Call<RecordResponse>
 }
 
 object FileApi {

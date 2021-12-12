@@ -10,6 +10,12 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.misaengfly.chordbox.musiclist.MusicListFragment
+import com.misaengfly.chordbox.network.FileApi
+import com.misaengfly.chordbox.network.RecordResponse
+import com.misaengfly.chordbox.player.ChordFragment
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun getCurrentToken(){
+    private fun getCurrentToken() {
         val TAG = "Current Token"
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -61,6 +67,50 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container, musicListFragment)
             .commit()
+
+        // Notification을 눌렀을 때 해당 파일로 이동
+        val notifyFile: String? = intent.getStringExtra("Notification")
+        notifyFile?.let {
+            saveResultToDB(it)
+            val path = filesDir.absolutePath.toString() + "/" + it
+            moveChordFragment(path)
+        }
+    }
+
+    /**
+     * Notification 클릭 시 DB에 결과 값 저장
+     * @param path : 저장할 파일 이름
+     * */
+    private fun saveResultToDB(fileName: String) {
+        FileApi.retrofitService.getRecordChord(fileName).enqueue(object : Callback<RecordResponse> {
+            override fun onResponse(
+                call: Call<RecordResponse>,
+                response: Response<RecordResponse>
+            ) {
+                Log.d("Record Chord Download", response.message())
+            }
+
+            override fun onFailure(call: Call<RecordResponse>, t: Throwable) {
+                Log.d("Record Chord Download", t.toString())
+            }
+        })
+    }
+
+    /**
+     * Notification 클릭 시 해당 파일로 이동
+     * @param path : 이동할 File Path
+     * */
+    private fun moveChordFragment(path: String) {
+        val fragment = ChordFragment()
+
+        val bundle = Bundle()
+        bundle.putString("Path", path)
+        fragment.arguments = bundle
+
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
