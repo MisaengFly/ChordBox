@@ -3,7 +3,6 @@ package com.misaengfly.chordbox.musiclist
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.AdapterView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
@@ -57,6 +56,16 @@ class MusicListFragment : Fragment() {
             }
         )
 
+        // 녹음 파일 개수 변화 감지
+        androidViewModel.chordList.observe(viewLifecycleOwner) {
+            androidViewModel.updateMusicList()
+        }
+
+        // Youtube 파일 개수 변화 감지
+        androidViewModel.urlList.observe(viewLifecycleOwner) {
+            androidViewModel.updateMusicList()
+        }
+
         androidViewModel.musicList.observe(viewLifecycleOwner, {
             adapter.data = it
         })
@@ -68,7 +77,12 @@ class MusicListFragment : Fragment() {
         }
     }
 
-    // pop up menu 보여주는 method
+    /**
+     * pop up menu 보여주는 method
+     *
+     * [ pop up menu ] 구성
+     * 1. 삭제 버튼
+     **/
     private fun showPopupMenu(view: View?, item: MusicItem) {
         val contextThemeWrapper =
             ContextThemeWrapper(requireContext(), R.style.PopupMenuStyle)

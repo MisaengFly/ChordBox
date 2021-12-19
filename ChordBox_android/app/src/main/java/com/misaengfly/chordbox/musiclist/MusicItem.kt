@@ -1,8 +1,12 @@
 package com.misaengfly.chordbox.musiclist
 
+import com.misaengfly.chordbox.MusicType
+
 data class MusicItem(
+    val type: MusicType,
     val absolutePath: String,
     val fileName: String,
     val duration: String,
-    val lastModified: String
+    val lastModified: String,
+    val chordMap: Map<Int, String>
 )

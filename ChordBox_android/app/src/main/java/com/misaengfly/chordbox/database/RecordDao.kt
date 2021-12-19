@@ -1,9 +1,7 @@
 package com.misaengfly.chordbox.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.lifecycle.LiveData
+import androidx.room.*
 
 @Dao
 interface RecordDao {
@@ -15,6 +13,12 @@ interface RecordDao {
 
     @Query("DELETE FROM record_table")
     suspend fun clearRecordTable()
+
+    @Query("DELETE FROM record_table WHERE file_absolute_path = :key")
+    suspend fun clearRecord(key: String)
+
+    @Query("SELECT * FROM record_table")
+    fun getRecords(): LiveData<List<Record>>
 
     @Query("SELECT * FROM record_table WHERE file_absolute_path = :key")
     suspend fun getRecord(key: String): Record?

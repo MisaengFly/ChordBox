@@ -202,8 +202,7 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
                 runOnUiThread {
                     if (recorder.isRecording) {
                         recordTimeView.text = (it * 1000).formatAsTime()
-                    }
-                }
+                    }                }
             }
             onForcedStop = {
                 File(recorder.filePath).delete()

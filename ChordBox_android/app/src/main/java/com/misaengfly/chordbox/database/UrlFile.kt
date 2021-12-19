@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 import com.misaengfly.chordbox.MusicType
 import com.misaengfly.chordbox.musiclist.MusicItem
 
-@Entity(tableName = "record_table")
-data class Record(
+@Entity(tableName = "url_table")
+data class UrlFile(
     @PrimaryKey
+    var url: String,
     @ColumnInfo(name = "file_absolute_path")
     var fileAbsolutePath: String,
     var fileName: String,
@@ -16,28 +17,24 @@ data class Record(
     var lastModified: String,
     var chords: String,
     var times: String
+
 ) {
-    constructor() : this("", "", "", "", "", "")
-    constructor(filePath: String, fileName: String, duration: String, lastModified: String) : this(
-        filePath, fileName, duration, lastModified, "", ""
-    )
+    constructor() : this("", "", "", "", "", "", "")
+    constructor(url: String) : this(url, "", "", "", "", "", "")
 }
 
-fun List<Record>.asDomainModel(): List<MusicItem> {
+fun List<UrlFile>.asDomainModel(): List<MusicItem> {
     return map {
         val tempMap: MutableMap<Int, String> = mutableMapOf()
+        val chordList = it.chords.split(" ")
+        val timeList = it.times.split(" ")
 
-        if (!it.chords.isNullOrBlank()) {
-            val chordList = it.chords.split(" ")
-            val timeList = it.times.split(" ")
-
-            for (i in chordList.indices) {
-                tempMap[timeList[i].toInt()] = chordList[i]
-            }
+        for (i in chordList.indices) {
+            tempMap[timeList[i].toInt()] = chordList[i]
         }
 
         MusicItem(
-            type = MusicType.RECORD,
+            type = MusicType.URL,
             absolutePath = it.fileAbsolutePath,
             fileName = it.fileName,
             duration = it.duration,
