@@ -21,7 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChordBox"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,7 +32,8 @@
         </activity>
         <activity android:name=".record.RecordActivity" />
 
-        <service android:name=".network.ChordFirebaseMessagingService"
+        <service
+            android:name=".network.ChordFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

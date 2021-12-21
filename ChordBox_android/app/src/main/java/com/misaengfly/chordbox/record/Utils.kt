@@ -26,10 +26,16 @@ const val SEEK_OVER_AMOUNT = 5000
 
 val Context.recordFile: File
     get() {
-        val fileCount = filesDir.listFiles { _, name ->
+        val fileList = filesDir.listFiles { dir, name ->
             name.contains("musicrecord")
-        }?.size ?: 0
-        return File(filesDir, "musicrecord${fileCount}.wav")
+        }
+
+        val fileIndex = if (fileList.isNotEmpty()) {
+            fileList.last().absolutePath.toString().split("/").last().removePrefix("musicrecord")
+                .removeSuffix(".wav").toInt() + 1
+        } else 0
+
+        return File(filesDir, "musicrecord${fileIndex}.wav")
     }
 
 val String.loadFile: File
