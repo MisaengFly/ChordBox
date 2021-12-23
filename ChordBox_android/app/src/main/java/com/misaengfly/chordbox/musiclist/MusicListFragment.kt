@@ -2,24 +2,28 @@ package com.misaengfly.chordbox.musiclist
 
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.TextView
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.card.MaterialCardView
+import com.misaengfly.chordbox.MusicType
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentMusicListBinding
 import com.misaengfly.chordbox.dialog.SelectBottomSheet
 import com.misaengfly.chordbox.player.ChordFragment
+import com.misaengfly.chordbox.player.UrlChordFragment
 import java.lang.reflect.Method
 
 class MusicListFragment : Fragment() {
 
     private lateinit var musicListBinding: FragmentMusicListBinding
     private lateinit var androidViewModel: MusicListViewModel
+
+    private var mLastClickTime = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +43,8 @@ class MusicListFragment : Fragment() {
             ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
         ).get(MusicListViewModel::class.java)
 
+        mLastClickTime = 0L
+
         return musicListBinding.root
     }
 
@@ -47,7 +53,12 @@ class MusicListFragment : Fragment() {
 
         val adapter = MusicAdapter(
             MusicAdapter.MusicItemListener {
-                replaceFragment(ChordFragment(), it)
+                when (it.type) {
+                    MusicType.RECORD ->
+                        replaceChordFragment(it.absolutePath)
+                    MusicType.URL ->
+                        replaceUrlChordFragment()
+                }
             },
             MusicAdapter.DeleteItemListener { view, item ->
                 // Long 클릭 시 해당 Item 지우기
@@ -72,8 +83,12 @@ class MusicListFragment : Fragment() {
         musicListBinding.musicListRV.adapter = adapter
 
         musicListBinding.newMusicFAB.setOnClickListener {
-            SelectBottomSheet.newInstance()
-                .show(requireActivity().supportFragmentManager, "SelectBottomSheet")
+            // 중복 클릭 방지
+            if (SystemClock.elapsedRealtime() - mLastClickTime > 1000) {
+                SelectBottomSheet.newInstance()
+                    .show(requireActivity().supportFragmentManager, "SelectBottomSheet")
+            }
+            mLastClickTime = SystemClock.elapsedRealtime()
         }
     }
 
@@ -92,7 +107,12 @@ class MusicListFragment : Fragment() {
         popupMenu.menuInflater.inflate(R.menu.pop_up_menu, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { m ->
             if (m.itemId == R.id.list_action_delete) {
-                androidViewModel.removeFile(item.absolutePath)
+                when (item.type) {
+                    MusicType.RECORD ->
+                        androidViewModel.removeFile(item.absolutePath)
+                    MusicType.URL ->
+                        androidViewModel.removeUrl(item.url)
+                }
             }
             false
         }
@@ -129,11 +149,21 @@ class MusicListFragment : Fragment() {
         androidViewModel.updateFiles()
     }
 
-    private fun replaceFragment(fragment: Fragment, path: String) {
+    private fun replaceChordFragment(path: String) {
+        val fragment = ChordFragment()
+
         val bundle = Bundle()
         bundle.putString("Path", path)
         fragment.arguments = bundle
 
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
+    private fun replaceUrlChordFragment() {
+        val fragment = UrlChordFragment()
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null)

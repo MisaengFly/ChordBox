@@ -99,6 +99,9 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
         val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet_info, null)
         val bottomSheetDialog = BottomSheetDialog(this)
         bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.setOnDismissListener {
+            finish()
+        }
         bottomSheetDialog.show()
     }
 

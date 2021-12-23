@@ -15,7 +15,6 @@ import java.io.File
 import java.io.FileFilter
 
 class MusicListViewModel(application: Application) : AndroidViewModel(application) {
-    private val mApplication = application
 
     private val database = ChordDatabase.getInstance(application)
     private val musicListRepository = MusicListRepository(database)
@@ -57,6 +56,13 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             File(filePath).delete()
             musicListRepository.deleteRecord(filePath)
+            updateMusicList()
+        }
+    }
+
+    fun removeUrl(url: String) {
+        viewModelScope.launch {
+            musicListRepository.deleteUrl(url)
             updateMusicList()
         }
     }

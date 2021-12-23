@@ -38,6 +38,7 @@ fun List<Record>.asDomainModel(): List<MusicItem> {
 
         MusicItem(
             type = MusicType.RECORD,
+            url = "",
             absolutePath = it.fileAbsolutePath,
             fileName = it.fileName,
             duration = it.duration,

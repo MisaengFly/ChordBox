@@ -17,6 +17,9 @@ interface UrlDao {
     @Query("DELETE FROM url_table")
     suspend fun clearUrlTable()
 
+    @Query("DELETE FROM url_table WHERE url = :key")
+    suspend fun clearUrl(key: String)
+
     @Query("SELECT * FROM url_table")
     fun getUrlFiles(): LiveData<List<UrlFile>>
 

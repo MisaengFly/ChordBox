@@ -6,12 +6,10 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.textfield.TextInputEditText
-import com.misaengfly.chordbox.R
+import com.misaengfly.chordbox.databinding.BottomSheetYoutubeUrlBinding
 import com.misaengfly.chordbox.network.FileApi
 import retrofit2.Call
 import retrofit2.Callback
@@ -19,20 +17,23 @@ import retrofit2.Response
 
 class SendUrlBottomSheet : BottomSheetDialogFragment() {
 
-    private lateinit var sendBtn: Button
-    private lateinit var sendEdit: TextInputEditText
+    private var youtubeUrlBinding: BottomSheetYoutubeUrlBinding? = null
+
+    private val viewModel: SendUrlBottomViewModel by lazy {
+        val viewModelFactory =
+            SendUrlBottomViewModel.Factory(requireActivity().application)
+        ViewModelProvider(this, viewModelFactory).get(SendUrlBottomViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.bottom_sheet_youtube_url, container, false)
+        val binding = BottomSheetYoutubeUrlBinding.inflate(inflater, container, false)
+        youtubeUrlBinding = binding
 
-        sendBtn = view.findViewById(R.id.send_url_btn)
-        sendEdit = view.findViewById(R.id.send_url_et)
-
-        return view
+        return binding.root
     }
 
     companion object {
@@ -44,25 +45,39 @@ class SendUrlBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.send_url_btn).setOnClickListener {
-            var urlString = sendEdit.text
-            if (urlString.isNullOrBlank()) {
-                Toast.makeText(requireContext(), "Please Input the Youtube url", Toast.LENGTH_SHORT).show()
-            } else if (!Patterns.WEB_URL.matcher(urlString).matches()) {
-                Toast.makeText(requireContext(), "올바른 형식의 URL을 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else {
-                FileApi.retrofitService.sendYoutubeUrl(urlString.toString()).enqueue(object : Callback<Unit> {
-                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                        Log.d("Send URL cb success : ", response.message())
-                        dismiss()
-                    }
+        youtubeUrlBinding!!.sendUrlBtn.setOnClickListener {
+            var urlString = youtubeUrlBinding!!.sendUrlEt.text
 
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Log.d("Send URL cb failure", t.toString())
-                        dismiss()
-                    }
-                })
+            // TODO (이미 있는 url인 경우 처리해줘야 함)
+            if (urlString.isNullOrBlank()) {
+                Toast.makeText(requireContext(), "Please Input the Youtube url", Toast.LENGTH_SHORT)
+                    .show()
+            } else if (!Patterns.WEB_URL.matcher(urlString).matches()) {
+                Toast.makeText(requireContext(), "Please Input correct url", Toast.LENGTH_SHORT)
+                    .show()
+            } else { // 올바른 url format 입력
+                // 1. DB에 저장
+                viewModel.insertUrlToDB(urlString.toString())
+
+                // 2. 서버에 저장
+                FileApi.retrofitService.sendYoutubeUrl(urlString.toString())
+                    .enqueue(object : Callback<Unit> {
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            Log.d("Send URL cb success : ", response.message())
+                            dismiss()
+                        }
+
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            Log.d("Send URL cb failure", t.toString())
+                            dismiss()
+                        }
+                    })
             }
         }
+    }
+
+    override fun onDestroyView() {
+        youtubeUrlBinding = null
+        super.onDestroyView()
     }
 }

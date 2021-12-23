@@ -34,8 +34,8 @@ class MusicAdapter(
             notifyDataSetChanged()
         }
 
-    class MusicItemListener(private val clickListener: (filePath: String) -> Unit) {
-        fun onClick(music: MusicItem) = clickListener(music.absolutePath)
+    class MusicItemListener(private val clickListener: (item: MusicItem) -> Unit) {
+        fun onClick(music: MusicItem) = clickListener(music)
     }
 
     class DeleteItemListener(longClickListener: (view: View?, item: MusicItem) -> Boolean) {
