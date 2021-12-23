@@ -15,7 +15,7 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
             field = value
             notifyDataSetChanged()
         }
-    
+
     var selectedPosition = 0
         set(value) {
             field = value
@@ -67,5 +67,9 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
             holder.bind(param)
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int =
+        if (data.toList().maxByOrNull { it.first } == null) 0
+        else {
+            data.toList().maxByOrNull { it.first }!!.first
+        }
 }

@@ -20,7 +20,7 @@ class UrlChordFragment : Fragment() {
     private val binding get() = urlChordBinding!!
 
     private lateinit var adapter: UrlChordAdapter
-    
+
     private var player: MediaPlayer? = null
     private var isPlaying = false
 
@@ -62,8 +62,7 @@ class UrlChordFragment : Fragment() {
                 val curPosition = player!!.currentPosition
                 val millisecond = curPosition + seekTime
                 player!!.seekTo(millisecond)
-                adapter.selectedPosition =
-                    (((millisecond + 400) % (1000 * 60 * 60)) % (1000 * 60) / 1000)
+                adapter.selectedPosition = (((millisecond + 400) / 1000))
             }
         }
 
@@ -71,8 +70,7 @@ class UrlChordFragment : Fragment() {
             val curPosition = player!!.currentPosition
             var millisecond = if (curPosition - seekTime < 0) 0 else curPosition - seekTime
             player!!.seekTo(millisecond)
-            adapter.selectedPosition =
-                (((millisecond + 400) % (1000 * 60 * 60)) % (1000 * 60) / 1000)
+            adapter.selectedPosition = (((millisecond + 400) / 1000))
         }
     }
 
@@ -83,8 +81,9 @@ class UrlChordFragment : Fragment() {
         player = MediaPlayer.create(requireContext(), R.raw.butter)
         timerTask = timer(period = 500) {
             time += 50
-            val second =
-                (((player!!.currentPosition + 400) % (1000 * 60 * 60)) % (1000 * 60) / 1000)
+            val second = (((player!!.currentPosition + 400) / 1000))
+
+            Log.i("Timer : ", second.toString())
 
             requireActivity().runOnUiThread {
                 adapter.selectedPosition = second
