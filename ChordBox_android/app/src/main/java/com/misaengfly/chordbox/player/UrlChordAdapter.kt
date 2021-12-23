@@ -3,7 +3,6 @@ package com.misaengfly.chordbox.player
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +15,12 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
             field = value
             notifyDataSetChanged()
         }
+    
+    var selectedPosition = 0
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     class ViewHolder private constructor(val binding: ItemUrlChordBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -23,14 +28,16 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
         fun bind(chord: String) {
             binding.itemUrlTv.apply {
                 text = chord
-                background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_url_item)
+                background = ColorDrawable(Color.TRANSPARENT)
             }
         }
 
-        fun bindEmpty() {
+        fun bindSelected(chord: String) {
             binding.itemUrlTv.apply {
-                text = ""
-                background = ColorDrawable(Color.TRANSPARENT)
+                text = chord
+                background = ContextCompat.getDrawable(
+                    binding.root.context, R.drawable.bg_url_selected_item
+                )
             }
         }
 
@@ -52,10 +59,12 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (data.containsKey(position)) {
-            holder.bind(data[position]!!)
-        } else
-            holder.bindEmpty()
+        val param = if (data.containsKey(position)) data[position]!! else ""
+
+        if (selectedPosition == position)
+            holder.bindSelected(param)
+        else
+            holder.bind(param)
     }
 
     override fun getItemCount(): Int = data.size

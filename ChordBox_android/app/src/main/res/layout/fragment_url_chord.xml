@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
@@ -31,10 +32,15 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
+        android:background="@drawable/bg_url_chord_rv"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/url_music_play_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/url_music_date_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/url_music_date_tv"
+        app:spanCount="4"
+        tools:itemCount="12"
+        tools:listitem="@layout/item_url_chord" />
 
     <ImageButton
         android:id="@+id/url_music_play_btn"
@@ -42,8 +48,8 @@
         android:layout_height="60dp"
         android:layout_marginBottom="32dp"
         android:background="@null"
-        android:src="@drawable/ic_play"
         android:scaleType="fitXY"
+        android:src="@drawable/ic_play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/url_music_forward_btn"
         app:layout_constraintStart_toEndOf="@+id/url_music_backward_btn" />

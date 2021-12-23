@@ -6,13 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.GsonBuilder
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.ReadAssets
 import com.misaengfly.chordbox.databinding.FragmentChordBinding
 import com.misaengfly.chordbox.record.SEEK_OVER_AMOUNT
 import com.misaengfly.chordbox.record.convertLongToDateTime
-import org.json.JSONObject
 import java.io.File
 import kotlin.math.sqrt
 
