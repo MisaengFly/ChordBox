@@ -29,7 +29,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/url_music_chord_container"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
         android:background="@drawable/bg_url_chord_rv"
@@ -38,6 +38,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/url_music_date_tv"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constrainedHeight="true"
         app:spanCount="4"
         tools:itemCount="12"
         tools:listitem="@layout/item_url_chord" />
