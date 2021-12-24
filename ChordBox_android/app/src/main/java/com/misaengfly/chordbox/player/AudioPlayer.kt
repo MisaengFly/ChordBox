@@ -63,6 +63,10 @@ class AudioPlayer private constructor(context: Context) : Player.Listener {
         return this
     }
 
+    fun isPlaying(): Boolean {
+        return player.isPlaying
+    }
+
     fun togglePlay() {
         if (!player.isPlaying) {
             resume()

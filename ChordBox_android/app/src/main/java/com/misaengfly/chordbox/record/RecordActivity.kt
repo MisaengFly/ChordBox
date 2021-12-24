@@ -8,12 +8,13 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.misaengfly.chordbox.MyCountDownTimer
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.databinding.ActivityRecordBinding
@@ -27,6 +28,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.util.*
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val RECORDING = 0
@@ -41,6 +43,16 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
         val dataSource = ChordDatabase.getInstance(this.application).recordDao
         val viewModelFactory = RecordViewModelFactory(dataSource, this.application)
         ViewModelProvider(this, viewModelFactory).get(RecordViewModel::class.java)
+    }
+
+    /**
+     * Timer 설정하기
+     **/
+    private var timer: MyCountDownTimer? = null
+
+    companion object {
+        const val TIMER_DURATION = 300000L
+        const val TIMER_INTERVAL = 1000L
     }
 
     /**
@@ -135,6 +147,20 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
     override fun onStart() {
         super.onStart()
         listenOnRecorderStates()
+        // Timer 설정
+        timer = object : MyCountDownTimer(TIMER_DURATION, TIMER_INTERVAL) {
+            override fun onTimerTick(millisUntilFinished: Long) {
+                Log.i("CountDownTimer : ", millisUntilFinished.toString())
+            }
+
+            override fun onTimerFinish() {
+                Log.d("CountDownTimer : ", "finished")
+                if (recorder.isRecording) {
+                    recorder.stopRecording()
+                    timer?.stop()
+                }
+            }
+        }
         // File Name 보여주기
         binding.recordFileNameTv.text = File(recorder.filePath).name
     }
@@ -151,6 +177,8 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
 
     override fun onStop() {
         recorder.release()
+        timer = null
+        finish()
         super.onStop()
     }
 
@@ -158,6 +186,7 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
         when (type) {
             RECORDING -> {
                 recorder.toggleRecording()
+                timer?.start()
                 binding.recordBtn.visibility = GONE
                 binding.pauseBtn.visibility = VISIBLE
                 binding.stopBtn.visibility = VISIBLE
@@ -166,14 +195,17 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
                 binding.recordBtn.visibility = GONE
                 if (recorder.isRecording) {
                     recorder.pauseRecording()
+                    timer?.pause()
                     binding.pauseBtn.setImageDrawable(getDrawable(R.drawable.ic_radio_checked))
                 } else {
                     recorder.toggleRecording()
+                    timer?.start()
                     binding.pauseBtn.setImageDrawable(getDrawable(R.drawable.ic_pause))
                 }
             }
             STOP -> {
                 recorder.stopRecording()
+                timer?.stop()
                 binding.recordBtn.visibility = VISIBLE
                 binding.pauseBtn.visibility = GONE
                 binding.stopBtn.visibility = GONE

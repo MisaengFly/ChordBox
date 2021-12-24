@@ -70,7 +70,11 @@ class ChordFragment : Fragment() {
         musicPlayBtn.setOnClickListener {
             player.togglePlay()
             // 땜방
-            musicPlayBtn.setImageResource(R.drawable.ic_stop)
+            if (player.isPlaying())
+                musicPlayBtn.setImageResource(R.drawable.ic_pause)
+            else
+                musicPlayBtn.setImageResource(R.drawable.ic_play)
+
         }
         musicForwardBtn.setOnClickListener { playerVisualizer.seekOver(SEEK_OVER_AMOUNT) }
         musicBackwardBtn.setOnClickListener { playerVisualizer.seekOver(-SEEK_OVER_AMOUNT) }
