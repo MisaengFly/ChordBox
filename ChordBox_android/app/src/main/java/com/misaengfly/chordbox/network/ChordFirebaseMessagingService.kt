@@ -19,12 +19,18 @@ class ChordFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
+        val prefToken = pref.getString("token", null)
 
-        if (pref.getString("token", null) == null) {
+        if (prefToken == null) {
             val editor = pref.edit()
             editor.putString("token", token)
             editor.commit()
             Log.i("onNewToken", "Success save token")
+        } else if (prefToken != token) {
+            val editor = pref.edit()
+            editor.putString("token", token)
+            editor.apply()
+            Log.i("onNewToken", "Success update token")
         }
     }
 

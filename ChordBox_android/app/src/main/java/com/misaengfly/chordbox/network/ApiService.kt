@@ -22,7 +22,10 @@ private val retrofit = Retrofit.Builder()
 interface ApiService {
     @Multipart
     @POST("/uploadFile")
-    fun sendAudioFile(@Part file: MultipartBody.Part): Call<FileResponse>
+    fun sendAudioFile(
+        @Part file: MultipartBody.Part,
+        @Part("deviceId") deviceId: String,
+    ): Call<FileResponse>
 
     @FormUrlEncoded
     @POST("/uploadUrl")

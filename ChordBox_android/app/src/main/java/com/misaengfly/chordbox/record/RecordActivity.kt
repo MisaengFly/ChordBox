@@ -1,6 +1,7 @@
 package com.misaengfly.chordbox.record
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -92,19 +93,24 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
         // DB에 저장
         viewModel.insertRecord(file.absolutePath, file.name)
 
-        // 서버로 전송
-        FileApi.retrofitService.sendAudioFile(body).enqueue(object : Callback<FileResponse> {
-            override fun onResponse(
-                call: Call<FileResponse>,
-                response: Response<FileResponse>
-            ) {
-                Log.d("callback success : ", response.message())
-            }
+        // FCM 토큰 가지고 오기
+        val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
+        val prefToken = pref.getString("token", null)
 
-            override fun onFailure(call: Call<FileResponse>, t: Throwable) {
-                Log.d("callback failure", t.toString())
-            }
-        })
+        // 서버로 전송
+        FileApi.retrofitService.sendAudioFile(body, prefToken!!)
+            .enqueue(object : Callback<FileResponse> {
+                override fun onResponse(
+                    call: Call<FileResponse>,
+                    response: Response<FileResponse>
+                ) {
+                    Log.d("callback success : ", response.message())
+                }
+
+                override fun onFailure(call: Call<FileResponse>, t: Throwable) {
+                    Log.d("callback failure", t.toString())
+                }
+            })
         dialog.dismiss()
 
         // 알림창 보여주기
