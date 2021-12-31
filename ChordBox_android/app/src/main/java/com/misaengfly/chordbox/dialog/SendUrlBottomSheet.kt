@@ -1,5 +1,6 @@
 package com.misaengfly.chordbox.dialog
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -48,19 +49,24 @@ class SendUrlBottomSheet : BottomSheetDialogFragment() {
         youtubeUrlBinding!!.sendUrlBtn.setOnClickListener {
             var urlString = youtubeUrlBinding!!.sendUrlEt.text
 
-            // TODO (이미 있는 url인 경우 처리해줘야 함)
             if (urlString.isNullOrBlank()) {
                 Toast.makeText(requireContext(), "Please Input the Youtube url", Toast.LENGTH_SHORT)
                     .show()
+            } else if (viewModel.isExistUrl(urlString.toString())) {
+                Toast.makeText(requireContext(), "The url already exists!", Toast.LENGTH_LONG).show()
             } else if (!Patterns.WEB_URL.matcher(urlString).matches()) {
                 Toast.makeText(requireContext(), "Please Input correct url", Toast.LENGTH_SHORT)
                     .show()
             } else { // 올바른 url format 입력
+                // 0. FCM 토큰 가지고 오기
+                val pref = view.context.getSharedPreferences("token", Context.MODE_PRIVATE)
+                val prefToken = pref.getString("token", null)
+
                 // 1. DB에 저장
                 viewModel.insertUrlToDB(urlString.toString())
 
                 // 2. 서버에 저장
-                FileApi.retrofitService.sendYoutubeUrl(urlString.toString())
+                FileApi.retrofitService.sendYoutubeUrl(urlString.toString(), prefToken!!)
                     .enqueue(object : Callback<Unit> {
                         override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                             Log.d("Send URL cb success : ", response.message())

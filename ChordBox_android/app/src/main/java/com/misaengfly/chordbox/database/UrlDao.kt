@@ -23,6 +23,6 @@ interface UrlDao {
     @Query("SELECT * FROM url_table")
     fun getUrlFiles(): LiveData<List<UrlFile>>
 
-    @Query("SELECT * FROM url_table WHERE file_absolute_path = :key")
+    @Query("SELECT * FROM url_table WHERE url = :key")
     suspend fun getUrlFile(key: String): UrlFile?
 }

@@ -5,6 +5,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.gms.tasks.OnCompleteListener
@@ -13,6 +14,7 @@ import com.misaengfly.chordbox.musiclist.MusicListFragment
 import com.misaengfly.chordbox.network.FileApi
 import com.misaengfly.chordbox.network.RecordResponse
 import com.misaengfly.chordbox.player.ChordFragment
+import com.misaengfly.chordbox.player.UrlChordFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -71,9 +73,13 @@ class MainActivity : AppCompatActivity() {
         // Notification을 눌렀을 때 해당 파일로 이동
         val notifyFile: String? = intent.getStringExtra("Notification")
         notifyFile?.let {
-            saveResultToDB(it)
-            val path = filesDir.absolutePath.toString() + "/" + it
-            moveChordFragment(path)
+            if (URLUtil.isValidUrl(it)) {
+                moveUrlChordFragment()
+            } else {
+                saveResultToDB(it)
+                val path = filesDir.absolutePath.toString() + "/" + it
+                moveChordFragment(path)
+            }
         }
     }
 
@@ -97,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Notification 클릭 시 해당 파일로 이동
+     * Notification 클릭 시 녹음 파일의 결과값일 때 해당 파일로 이동
      * @param path : 이동할 File Path
      * */
     private fun moveChordFragment(path: String) {
@@ -107,6 +113,17 @@ class MainActivity : AppCompatActivity() {
         bundle.putString("Path", path)
         fragment.arguments = bundle
 
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
+    /**
+     * Notification 클릭 시 Url 전송의 결과값일 때 해당 파일로 이동
+     * */
+    private fun moveUrlChordFragment() {
+        val fragment = UrlChordFragment()
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null)

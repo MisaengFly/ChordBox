@@ -20,7 +20,32 @@ data class UrlFile(
 
 ) {
     constructor() : this("", "", "", "", "", "", "")
-    constructor(url: String, lastModified: String) : this(url, "", "", "", lastModified, "", "")
+    constructor(url: String, lastModified: String) : this(
+        url, "", "", "", lastModified, "", ""
+    )
+}
+
+fun UrlFile.asDomainModel(): MusicItem {
+    val tempMap: MutableMap<Int, String> = mutableMapOf()
+
+    if (!this.chords.isNullOrBlank()) {
+        val chordList = this.chords.split(" ")
+        val timeList = this.times.split(" ")
+
+        for (i in chordList.indices) {
+            tempMap[timeList[i].toInt()] = chordList[i]
+        }
+    }
+
+    return MusicItem(
+        type = MusicType.URL,
+        url = this.url,
+        absolutePath = this.fileAbsolutePath,
+        fileName = this.fileName,
+        duration = this.duration,
+        lastModified = this.lastModified,
+        chordMap = tempMap.toMap()
+    )
 }
 
 fun List<UrlFile>.asDomainModel(): List<MusicItem> {

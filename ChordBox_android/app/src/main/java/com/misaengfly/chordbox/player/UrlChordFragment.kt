@@ -1,6 +1,5 @@
 package com.misaengfly.chordbox.player
 
-import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.ReadAssets
 import com.misaengfly.chordbox.databinding.FragmentUrlChordBinding
+import com.misaengfly.chordbox.dialog.SendUrlBottomViewModel
 import java.util.*
 import kotlin.concurrent.timer
 
@@ -19,13 +19,18 @@ class UrlChordFragment : Fragment() {
     private var urlChordBinding: FragmentUrlChordBinding? = null
     private val binding get() = urlChordBinding!!
 
+    private val viewModel: UrlChordViewModel by lazy {
+        val viewModelFactory =
+            UrlChordViewModel.Factory(requireActivity().application)
+        ViewModelProvider(this, viewModelFactory).get(UrlChordViewModel::class.java)
+    }
+
     private lateinit var adapter: UrlChordAdapter
 
     private var player: MediaPlayer? = null
     private var isPlaying = false
 
     private var timerTask: Timer? = null
-    private var time = 0
     private val seekTime = 5000
 
     override fun onCreateView(
@@ -35,7 +40,14 @@ class UrlChordFragment : Fragment() {
     ): View? {
         urlChordBinding = FragmentUrlChordBinding.inflate(LayoutInflater.from(context))
 
-        time = 0
+        val bundle = arguments
+        val url = bundle?.getString("Url").toString()
+
+        val musicItem = viewModel.findUrlItem(url)
+        if (musicItem != null) {
+            binding.urlMusicNameTv.text = musicItem.url
+            binding.urlMusicDateTv.text = musicItem.lastModified
+        }
 
         return binding.root
     }
@@ -72,6 +84,7 @@ class UrlChordFragment : Fragment() {
             player!!.seekTo(millisecond)
             adapter.selectedPosition = (((millisecond + 400) / 1000))
         }
+
     }
 
     private fun startPlaying() {
@@ -80,7 +93,6 @@ class UrlChordFragment : Fragment() {
         }
         player = MediaPlayer.create(requireContext(), R.raw.butter)
         timerTask = timer(period = 500) {
-            time += 50
             val second = (((player!!.currentPosition + 400) / 1000))
 
             Log.i("Timer : ", second.toString())
@@ -104,7 +116,6 @@ class UrlChordFragment : Fragment() {
         player = null
         timerTask?.cancel()
         binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_play)
-        time = 0
     }
 
     private fun pausePlaying() {

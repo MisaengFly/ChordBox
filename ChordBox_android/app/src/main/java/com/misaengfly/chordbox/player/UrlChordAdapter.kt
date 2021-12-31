@@ -67,6 +67,7 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
             holder.bind(param)
     }
 
+    // TODO(이 코드를 깔끔하게 짜고 싶다)
     override fun getItemCount(): Int =
         if (data.toList().maxByOrNull { it.first } == null) 0
         else {

@@ -15,7 +15,6 @@ import java.io.File
 import kotlin.math.sqrt
 
 class ChordFragment : Fragment() {
-
     private var chordBinding: FragmentChordBinding? = null
     private lateinit var player: AudioPlayer
 

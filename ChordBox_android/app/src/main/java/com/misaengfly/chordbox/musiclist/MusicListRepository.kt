@@ -43,4 +43,8 @@ class MusicListRepository(private val database: ChordDatabase) {
             database.urlDao.clearUrl(url)
         }
     }
+
+    suspend fun findUrl(url: String): MusicItem? {
+        return database.urlDao.getUrlFile(url)?.asDomainModel()
+    }
 }

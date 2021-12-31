@@ -57,7 +57,7 @@ class MusicListFragment : Fragment() {
                     MusicType.RECORD ->
                         replaceChordFragment(it.absolutePath)
                     MusicType.URL ->
-                        replaceUrlChordFragment()
+                        replaceUrlChordFragment(it.url)
                 }
             },
             MusicAdapter.DeleteItemListener { view, item ->
@@ -162,8 +162,13 @@ class MusicListFragment : Fragment() {
         transaction.commit()
     }
 
-    private fun replaceUrlChordFragment() {
+    private fun replaceUrlChordFragment(url: String) {
         val fragment = UrlChordFragment()
+
+        val bundle = Bundle()
+        bundle.putString("Url", url)
+        fragment.arguments = bundle
+
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null)

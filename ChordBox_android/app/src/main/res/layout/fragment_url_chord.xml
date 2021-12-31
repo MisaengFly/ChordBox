@@ -12,8 +12,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
         android:text="Music Name"
         android:textSize="25sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,12 +38,12 @@
         android:layout_marginBottom="32dp"
         android:background="@drawable/bg_url_chord_rv"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/url_music_play_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/url_music_date_tv"
         app:layout_constraintVertical_bias="0"
-        app:layout_constrainedHeight="true"
         app:spanCount="4"
         tools:itemCount="12"
         tools:listitem="@layout/item_url_chord" />

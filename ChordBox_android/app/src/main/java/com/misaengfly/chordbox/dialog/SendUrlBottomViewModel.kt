@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.database.UrlFile
+import com.misaengfly.chordbox.musiclist.MusicItem
 import com.misaengfly.chordbox.musiclist.MusicListRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,9 +24,9 @@ class SendUrlBottomViewModel(application: Application) :
      * DB에 저장
      * */
     fun insertUrlToDB(url: String) {
-        val time = System.currentTimeMillis()
-        val dateFormat = SimpleDateFormat("yyyy-mm-dd hh:mm")
-        val curTime = dateFormat.format(Date(time))
+        val date = Date(System.currentTimeMillis())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm")
+        val curTime = dateFormat.format(date)
 
         viewModelScope.launch {
             val urlInfo = UrlFile(
@@ -32,6 +34,13 @@ class SendUrlBottomViewModel(application: Application) :
                 curTime
             )
             musicListRepository.insertUrl(urlInfo)
+        }
+    }
+
+    fun isExistUrl(url: String): Boolean {
+        return runBlocking {
+            val musicItem = musicListRepository.findUrl(url)
+            musicItem != null
         }
     }
 

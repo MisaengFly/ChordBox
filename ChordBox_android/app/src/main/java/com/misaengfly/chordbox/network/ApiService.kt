@@ -24,12 +24,15 @@ interface ApiService {
     @POST("/uploadFile")
     fun sendAudioFile(
         @Part file: MultipartBody.Part,
-        @Part("deviceId") deviceId: String,
+        @Part("token") token: String,
     ): Call<FileResponse>
 
     @FormUrlEncoded
-    @POST("/uploadUrl")
-    fun sendYoutubeUrl(@Field("url") url: String): Call<Unit>
+    @POST("/youtube/uploadUrl")
+    fun sendYoutubeUrl(
+        @Field("url") url: String,
+        @Field("token") token: String
+    ): Call<Unit>
 
     @FormUrlEncoded
     @POST("/fileChord")
