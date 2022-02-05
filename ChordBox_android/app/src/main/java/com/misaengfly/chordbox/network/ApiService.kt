@@ -24,11 +24,11 @@ interface ApiService {
     @POST("/uploadFile")
     fun sendAudioFile(
         @Part file: MultipartBody.Part,
-        @Part("token") token: String,
+        @Part("token") token: String
     ): Call<FileResponse>
 
     @FormUrlEncoded
-    @POST("/youtube/uploadUrl")
+    @POST("/uploadUrl")
     fun sendYoutubeUrl(
         @Field("url") url: String,
         @Field("token") token: String
@@ -36,7 +36,10 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST("/fileChord")
-    fun getRecordChord(@Field("file_name") fileName: String): Call<RecordResponse>
+    fun getRecordChord(
+        @Field("filename") fileName: String,
+        @Field("token") token: String
+    ): Call<RecordResponse>
 }
 
 object FileApi {

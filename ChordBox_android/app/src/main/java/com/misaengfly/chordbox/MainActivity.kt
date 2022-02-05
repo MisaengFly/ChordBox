@@ -1,5 +1,6 @@
 package com.misaengfly.chordbox
 
+import android.content.Context
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         val notifyFile: String? = intent.getStringExtra("Notification")
         notifyFile?.let {
             if (URLUtil.isValidUrl(it)) {
-                moveUrlChordFragment()
+                moveUrlChordFragment(it)
             } else {
                 saveResultToDB(it)
                 val path = filesDir.absolutePath.toString() + "/" + it
@@ -88,18 +89,22 @@ class MainActivity : AppCompatActivity() {
      * @param path : 저장할 파일 이름
      * */
     private fun saveResultToDB(fileName: String) {
-        FileApi.retrofitService.getRecordChord(fileName).enqueue(object : Callback<RecordResponse> {
-            override fun onResponse(
-                call: Call<RecordResponse>,
-                response: Response<RecordResponse>
-            ) {
-                Log.d("Record Chord Download", response.message())
-            }
+        val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
+        val prefToken = pref.getString("token", null)
 
-            override fun onFailure(call: Call<RecordResponse>, t: Throwable) {
-                Log.d("Record Chord Download", t.toString())
-            }
-        })
+        FileApi.retrofitService.getRecordChord(fileName, prefToken!!)
+            .enqueue(object : Callback<RecordResponse> {
+                override fun onResponse(
+                    call: Call<RecordResponse>,
+                    response: Response<RecordResponse>
+                ) {
+                    Log.d("Record Chord Download", response.message())
+                }
+
+                override fun onFailure(call: Call<RecordResponse>, t: Throwable) {
+                    Log.d("Record Chord Download", t.toString())
+                }
+            })
     }
 
     /**
@@ -122,8 +127,13 @@ class MainActivity : AppCompatActivity() {
     /**
      * Notification 클릭 시 Url 전송의 결과값일 때 해당 파일로 이동
      * */
-    private fun moveUrlChordFragment() {
+    private fun moveUrlChordFragment(url: String) {
         val fragment = UrlChordFragment()
+
+        val bundle = Bundle()
+        bundle.putString("Url", url)
+        fragment.arguments = bundle
+
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null)

@@ -6,6 +6,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class RecordResponse(
     val fileName: String,
-    val chordList: List<String>,
-    val timeList: List<String>
+    val chordList: String,
+    val timeList: String
 ) : Parcelable

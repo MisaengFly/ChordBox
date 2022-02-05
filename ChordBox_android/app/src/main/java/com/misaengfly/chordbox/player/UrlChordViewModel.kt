@@ -14,7 +14,6 @@ class UrlChordViewModel(application: Application) :
     private val database = ChordDatabase.getInstance(application)
     private val musicListRepository = MusicListRepository(database)
 
-
     /**
      * DB에 저장
      * */

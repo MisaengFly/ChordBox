@@ -33,6 +33,7 @@ class UrlChordFragment : Fragment() {
     private var timerTask: Timer? = null
     private val seekTime = 5000
 
+    // TODO( 해당 Item 클릭 시 빠르게 이동하도록 수정 필요 )
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,6 +44,7 @@ class UrlChordFragment : Fragment() {
         val bundle = arguments
         val url = bundle?.getString("Url").toString()
 
+        // TODO( findUrlItem에서 결과값 안 받아와짐 )
         val musicItem = viewModel.findUrlItem(url)
         if (musicItem != null) {
             binding.urlMusicNameTv.text = musicItem.url
