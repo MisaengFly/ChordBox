@@ -9,5 +9,5 @@ data class MusicItem(
     val fileName: String,
     val duration: String,
     val lastModified: String,
-    val chordMap: Map<Int, String>
+    val chordMap: Map<Float, String>
 )

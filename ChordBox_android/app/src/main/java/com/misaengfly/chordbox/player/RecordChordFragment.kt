@@ -5,20 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.misaengfly.chordbox.R
-import com.misaengfly.chordbox.ReadAssets
 import com.misaengfly.chordbox.databinding.FragmentChordBinding
 import com.misaengfly.chordbox.record.SEEK_OVER_AMOUNT
 import com.misaengfly.chordbox.record.convertLongToDateTime
 import java.io.File
 import kotlin.math.sqrt
 
-class ChordFragment : Fragment() {
+class RecordChordFragment : Fragment() {
     private var chordBinding: FragmentChordBinding? = null
     private lateinit var player: AudioPlayer
 
     private lateinit var filePath: String
+
+    private val viewModel: RecordChordViewModel by lazy {
+        val viewModelFactory =
+            RecordChordViewModel.Factory(requireActivity().application)
+        ViewModelProvider(this, viewModelFactory).get(RecordChordViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +39,8 @@ class ChordFragment : Fragment() {
 
         binding.musicNameTv.text = File(filePath).name
         binding.musicDateTv.text = File(filePath).lastModified().convertLongToDateTime()
+
+        viewModel.findRecordItem(filePath)
 
         return binding.root
     }
@@ -80,7 +88,7 @@ class ChordFragment : Fragment() {
 
         lifecycleScope.launchWhenCreated {
             val amps = player.loadAmps()
-            val chordMap = ReadAssets().makeChordMap(resources)
+            val chordMap = viewModel.chordMap
             playerVisualizer.setWaveForm(amps, player.tickDuration, chordMap)
         }
     }

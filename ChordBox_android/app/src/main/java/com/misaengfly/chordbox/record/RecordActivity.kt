@@ -86,9 +86,12 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
     }
 
     override fun onDialogPositiveClick(dialog: DialogFragment) {
+        val sharedPreference = getSharedPreferences("SP", MODE_PRIVATE)
+        val value = sharedPreference.getString("uuid", null)
         val file = File(recorder.filePath)
+
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("audiofile", file.name, requestFile)
+        val body = MultipartBody.Part.createFormData("audiofile", (value + "_" +file.name), requestFile)
 
         // DB에 저장
         viewModel.insertRecord(file.absolutePath, file.name)

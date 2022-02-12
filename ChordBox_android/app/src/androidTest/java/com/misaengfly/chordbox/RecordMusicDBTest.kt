@@ -48,8 +48,7 @@ class RecordMusicDBTest {
         )
         recordDao.insert(record)
 
-        record.chords = "000"
-        recordDao.update(record)
+        recordDao.updateRecord("000", "0000", InstrumentationRegistry.getInstrumentation().targetContext.filesDir.absolutePath.toString())
 
         val one = recordDao.getOne()
         assertEquals(one?.chords, "000")

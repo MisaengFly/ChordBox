@@ -14,7 +14,7 @@ import com.misaengfly.chordbox.MusicType
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentMusicListBinding
 import com.misaengfly.chordbox.dialog.SelectBottomSheet
-import com.misaengfly.chordbox.player.ChordFragment
+import com.misaengfly.chordbox.player.RecordChordFragment
 import com.misaengfly.chordbox.player.UrlChordFragment
 import java.lang.reflect.Method
 
@@ -150,7 +150,7 @@ class MusicListFragment : Fragment() {
     }
 
     private fun replaceChordFragment(path: String) {
-        val fragment = ChordFragment()
+        val fragment = RecordChordFragment()
 
         val bundle = Bundle()
         bundle.putString("Path", path)

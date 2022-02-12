@@ -26,14 +26,14 @@ data class UrlFile(
 }
 
 fun UrlFile.asDomainModel(): MusicItem {
-    val tempMap: MutableMap<Int, String> = mutableMapOf()
+    val tempMap: MutableMap<Float, String> = mutableMapOf()
 
     if (!this.chords.isNullOrBlank()) {
         val chordList = this.chords.split(" ")
         val timeList = this.times.split(" ")
 
         for (i in chordList.indices) {
-            tempMap[timeList[i].toInt()] = chordList[i]
+            tempMap[timeList[i].toFloat()] = chordList[i]
         }
     }
 
@@ -50,14 +50,14 @@ fun UrlFile.asDomainModel(): MusicItem {
 
 fun List<UrlFile>.asDomainModel(): List<MusicItem> {
     return map {
-        val tempMap: MutableMap<Int, String> = mutableMapOf()
+        val tempMap: MutableMap<Float, String> = mutableMapOf()
 
         if (!it.chords.isNullOrBlank()) {
             val chordList = it.chords.split(" ")
             val timeList = it.times.split(" ")
 
             for (i in chordList.indices) {
-                tempMap[timeList[i].toInt()] = chordList[i]
+                tempMap[timeList[i].toFloat()] = chordList[i]
             }
         }
 

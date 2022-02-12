@@ -11,6 +11,7 @@ import com.misaengfly.chordbox.record.getColorCompat
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
+import kotlin.reflect.jvm.internal.impl.utils.NumberWithRadix
 
 open class BaseVisualizer : View {
 
@@ -131,20 +132,26 @@ open class BaseVisualizer : View {
         if (amps.isNotEmpty()) {
 
             // 그려줘야 할 코드 체크하는 용도
-            val drawCheck = Array((getEndBar() / 40 + 1)) { false }
+            val drawCheck = Array((getEndBar() / 40 + 1) * 10) { false }
+
+            val mtickDuration = tickDuration / 10
 
             for (i in getStartBar() until getEndBar()) {
                 val startX = width / 2 - (getBarPosition() - i) * (barWidth + spaceBetweenBar)
                 drawStraightBar(canvas, startX, getBarHeightAt(i).toInt(), getBaseLine())
 
-                if (timeStampDrawable && !drawCheck[(i/tickDuration)]) {
+//                if (timeStampDrawable && !drawCheck[(i / tickDuration)]) {
+                if (timeStampDrawable && !drawCheck[(i / mtickDuration)]) {
                     // 코드 뒤로 밀리는것 방지
-                    if ((i % tickDuration) > 2) {
-                        drawCheck[(i/tickDuration)] = true
+//                    if ((i % tickDuration) > 2) {
+                    if ((i % mtickDuration) > 2) {
+//                        drawCheck[(i / tickDuration)] = true
+                        drawCheck[(i / mtickDuration)] = true
                         continue
                     }
 
-                    bottomIdx = (i/tickDuration)
+//                    bottomIdx = (i / tickDuration)
+                    bottomIdx = (i / mtickDuration)
                     val timeBaseLine = (getBaseLine() * 2).toFloat()
                     canvas.drawLine(
                         startX,
@@ -153,6 +160,7 @@ open class BaseVisualizer : View {
                         timeBaseLine - 50f,
                         bottomBarPaint
                     )
+
 
                     if (chordDrawMap.containsKey(bottomIdx)) {
                         canvas.drawText(

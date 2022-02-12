@@ -25,14 +25,14 @@ data class Record(
 
 fun List<Record>.asDomainModel(): List<MusicItem> {
     return map {
-        val tempMap: MutableMap<Int, String> = mutableMapOf()
+        val tempMap: MutableMap<Float, String> = mutableMapOf()
 
         if (!it.chords.isNullOrBlank()) {
             val chordList = it.chords.split(" ")
             val timeList = it.times.split(" ")
 
             for (i in chordList.indices) {
-                tempMap[timeList[i].toInt()] = chordList[i]
+                tempMap[timeList[i].toFloat()] = chordList[i]
             }
         }
 

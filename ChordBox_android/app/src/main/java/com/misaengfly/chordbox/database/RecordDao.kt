@@ -11,6 +11,9 @@ interface RecordDao {
     @Update
     suspend fun update(record: Record)
 
+    @Query("UPDATE record_table SET chords = :chords, times = :times WHERE file_absolute_path = :path")
+    suspend fun updateRecord(chords: String, times: String, path: String)
+
     @Query("DELETE FROM record_table")
     suspend fun clearRecordTable()
 

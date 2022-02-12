@@ -9,18 +9,28 @@ import android.view.MenuItem
 import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.musiclist.MusicListFragment
 import com.misaengfly.chordbox.network.FileApi
 import com.misaengfly.chordbox.network.RecordResponse
-import com.misaengfly.chordbox.player.ChordFragment
+import com.misaengfly.chordbox.player.RecordChordFragment
 import com.misaengfly.chordbox.player.UrlChordFragment
+import com.misaengfly.chordbox.record.RecordViewModel
+import com.misaengfly.chordbox.record.RecordViewModelFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+
+    private val viewModel: RecordViewModel by lazy {
+        val dataSource = ChordDatabase.getInstance(this.application).recordDao
+        val viewModelFactory = RecordViewModelFactory(dataSource, this.application)
+        ViewModelProvider(this, viewModelFactory).get(RecordViewModel::class.java)
+    }
 
     private fun getDeviceUuid(): String? {
         return Settings.Secure.getString(
@@ -92,13 +102,22 @@ class MainActivity : AppCompatActivity() {
         val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
         val prefToken = pref.getString("token", null)
 
-        FileApi.retrofitService.getRecordChord(fileName, prefToken!!)
+        val sharedPreference = getSharedPreferences("SP", MODE_PRIVATE)
+        val value = sharedPreference.getString("uuid", null)
+        val sendFileName = (value + "_" + fileName)
+
+        val filePath = filesDir.absolutePath.toString() + "/" + fileName
+
+        FileApi.retrofitService.getRecordChord(sendFileName, prefToken!!)
             .enqueue(object : Callback<RecordResponse> {
                 override fun onResponse(
                     call: Call<RecordResponse>,
                     response: Response<RecordResponse>
                 ) {
                     Log.d("Record Chord Download", response.message())
+                    response.body()?.let {
+                        viewModel.updateRecord(it.chordList, it.timeList, filePath)
+                    }
                 }
 
                 override fun onFailure(call: Call<RecordResponse>, t: Throwable) {
@@ -112,7 +131,7 @@ class MainActivity : AppCompatActivity() {
      * @param path : 이동할 File Path
      * */
     private fun moveChordFragment(path: String) {
-        val fragment = ChordFragment()
+        val fragment = RecordChordFragment()
 
         val bundle = Bundle()
         bundle.putString("Path", path)

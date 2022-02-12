@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.misaengfly.chordbox.database.Record
 import com.misaengfly.chordbox.database.RecordDao
+import com.misaengfly.chordbox.network.RecordResponse
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -29,9 +30,9 @@ class RecordViewModel(val database: RecordDao, application: Application) :
     /**
      * Record_table의 데이터 업데이트
      **/
-    fun updateRecord() {
+    fun updateRecord(chords: String, times: String, filePath: String) {
         viewModelScope.launch {
-
+            database.updateRecord(chords, times, filePath)
         }
     }
 

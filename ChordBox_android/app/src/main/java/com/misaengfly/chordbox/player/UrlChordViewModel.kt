@@ -15,7 +15,7 @@ class UrlChordViewModel(application: Application) :
     private val musicListRepository = MusicListRepository(database)
 
     /**
-     * DB에 저장
+     * DB에서 로드
      * */
     fun findUrlItem(url: String): MusicItem? {
         return runBlocking {
