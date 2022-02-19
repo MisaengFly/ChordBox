@@ -1,11 +1,10 @@
 package com.misaengfly.chordbox.musiclist
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.misaengfly.chordbox.database.ChordDatabase
-import com.misaengfly.chordbox.database.Record
-import com.misaengfly.chordbox.database.UrlFile
-import com.misaengfly.chordbox.database.asDomainModel
+import com.misaengfly.chordbox.database.*
+import com.misaengfly.chordbox.player.UrlItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -44,7 +43,12 @@ class MusicListRepository(private val database: ChordDatabase) {
         }
     }
 
-    suspend fun findUrl(url: String): MusicItem? {
-        return database.urlDao.getUrlFile(url)?.asDomainModel()
+    suspend fun findUrl(url: String): UrlItem? {
+        return database.urlDao.getUrlFile(url)?.asUrlItem()
     }
+
+    suspend fun updateUrl(chords: String, times: String, url: String) =
+        withContext(Dispatchers.IO) {
+            database.urlDao.updateUrl(chords, times, url)
+        }
 }

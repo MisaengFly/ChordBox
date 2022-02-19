@@ -40,6 +40,13 @@ interface ApiService {
         @Field("filename") fileName: String,
         @Field("token") token: String
     ): Call<RecordResponse>
+
+    @FormUrlEncoded
+    @POST("/urlChord")
+    fun getUrlChord(
+        @Field("url") url: String,
+        @Field("token") token: String
+    ): Call<UrlResponse>
 }
 
 object FileApi {

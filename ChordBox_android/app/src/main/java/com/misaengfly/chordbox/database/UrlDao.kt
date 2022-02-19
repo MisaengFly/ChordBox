@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.misaengfly.chordbox.player.UrlItem
 
 @Dao
 interface UrlDao {
@@ -13,6 +14,9 @@ interface UrlDao {
 
     @Update
     suspend fun update(urlFile: UrlFile)
+
+    @Query("UPDATE url_table SET chords = :chords, times = :times WHERE url = :url")
+    suspend fun updateUrl(chords: String, times: String, url: String)
 
     @Query("DELETE FROM url_table")
     suspend fun clearUrlTable()

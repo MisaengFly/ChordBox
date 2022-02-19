@@ -8,6 +8,7 @@ import com.misaengfly.chordbox.database.Record
 import com.misaengfly.chordbox.database.RecordDao
 import com.misaengfly.chordbox.network.RecordResponse
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class RecordViewModel(val database: RecordDao, application: Application) :

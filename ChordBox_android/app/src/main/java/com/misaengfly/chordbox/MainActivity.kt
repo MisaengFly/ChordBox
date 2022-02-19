@@ -9,20 +9,26 @@ import android.view.MenuItem
 import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.musiclist.MusicListFragment
 import com.misaengfly.chordbox.network.FileApi
 import com.misaengfly.chordbox.network.RecordResponse
+import com.misaengfly.chordbox.network.UrlResponse
 import com.misaengfly.chordbox.player.RecordChordFragment
 import com.misaengfly.chordbox.player.UrlChordFragment
+import com.misaengfly.chordbox.player.UrlChordViewModel
 import com.misaengfly.chordbox.record.RecordViewModel
 import com.misaengfly.chordbox.record.RecordViewModelFactory
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +36,11 @@ class MainActivity : AppCompatActivity() {
         val dataSource = ChordDatabase.getInstance(this.application).recordDao
         val viewModelFactory = RecordViewModelFactory(dataSource, this.application)
         ViewModelProvider(this, viewModelFactory).get(RecordViewModel::class.java)
+    }
+
+    private val urlViewModel: UrlChordViewModel by lazy {
+        val viewModelFactory = UrlChordViewModel.Factory(application)
+        ViewModelProvider(this, viewModelFactory).get(UrlChordViewModel::class.java)
     }
 
     private fun getDeviceUuid(): String? {
@@ -85,11 +96,12 @@ class MainActivity : AppCompatActivity() {
         val notifyFile: String? = intent.getStringExtra("Notification")
         notifyFile?.let {
             if (URLUtil.isValidUrl(it)) {
-                moveUrlChordFragment(it)
+                val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
+                val prefToken = pref.getString("token", null)
+
+                saveUrlResultToDB(it, prefToken!!)
             } else {
                 saveResultToDB(it)
-                val path = filesDir.absolutePath.toString() + "/" + it
-                moveChordFragment(path)
             }
         }
     }
@@ -116,7 +128,10 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     Log.d("Record Chord Download", response.message())
                     response.body()?.let {
-                        viewModel.updateRecord(it.chordList, it.timeList, filePath)
+                        lifecycleScope.launch {
+                            viewModel.updateRecord(it.chordList, it.timeList, filePath)
+                            moveChordFragment(filePath)
+                        }
                     }
                 }
 
@@ -141,6 +156,38 @@ class MainActivity : AppCompatActivity() {
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
+    }
+
+
+    /**
+     * Notification 클릭 시 DB에 결과 값 저장
+     * @param path : 저장할 파일 이름
+     * */
+    private fun saveUrlResultToDB(url: String, prefToken: String) {
+        FileApi.retrofitService.getUrlChord(url, prefToken!!)
+            .enqueue(object : Callback<UrlResponse> {
+                override fun onResponse(
+                    call: Call<UrlResponse>,
+                    response: Response<UrlResponse>
+                ) {
+                    Log.d("Url Chord Download", response.message())
+                    response.body()?.let {
+                        Log.d("log", it.toString())
+                        lifecycleScope.launch {
+                            urlViewModel.updateUrlItem(
+                                it.chordList,
+                                it.timeList,
+                                it.url
+                            )
+                            moveUrlChordFragment(url)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<UrlResponse>, t: Throwable) {
+                    Log.d("Url Chord Download", t.toString())
+                }
+            })
     }
 
     /**

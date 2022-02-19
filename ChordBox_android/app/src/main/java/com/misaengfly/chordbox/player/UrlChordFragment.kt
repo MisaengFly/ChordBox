@@ -11,7 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.ReadAssets
 import com.misaengfly.chordbox.databinding.FragmentUrlChordBinding
-import com.misaengfly.chordbox.dialog.SendUrlBottomViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.concurrent.timer
 
@@ -44,11 +46,8 @@ class UrlChordFragment : Fragment() {
         val bundle = arguments
         val url = bundle?.getString("Url").toString()
 
-        // TODO( findUrlItem에서 결과값 안 받아와짐 )
-        val musicItem = viewModel.findUrlItem(url)
-        if (musicItem != null) {
-            binding.urlMusicNameTv.text = musicItem.url
-            binding.urlMusicDateTv.text = musicItem.lastModified
+        runBlocking {
+            viewModel.findUrlItem(url)
         }
 
         return binding.root
@@ -58,7 +57,15 @@ class UrlChordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = UrlChordAdapter()
-        adapter.data = ReadAssets().makeChordMap(resources)
+
+        viewModel.urlItem.observe(viewLifecycleOwner) {
+            it?.let {
+                Log.d("log", it.chordMap.size.toString())
+                binding.urlMusicNameTv.text = it.url
+                binding.urlMusicDateTv.text = it.lastModified
+                adapter.data = it.chordMap
+            }
+        }
         binding.urlMusicChordContainer.adapter = adapter
 
         binding.urlMusicPlayBtn.setOnClickListener {

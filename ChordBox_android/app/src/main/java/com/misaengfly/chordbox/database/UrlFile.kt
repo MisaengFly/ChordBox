@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.misaengfly.chordbox.MusicType
 import com.misaengfly.chordbox.musiclist.MusicItem
+import com.misaengfly.chordbox.player.UrlItem
 
 @Entity(tableName = "url_table")
 data class UrlFile(
@@ -22,6 +23,30 @@ data class UrlFile(
     constructor() : this("", "", "", "", "", "", "")
     constructor(url: String, lastModified: String) : this(
         url, "", "", "", lastModified, "", ""
+    )
+}
+
+fun UrlFile.asUrlItem(): UrlItem {
+    val tempMap: MutableMap<Int, String> = mutableMapOf()
+
+    if (!this.chords.isNullOrBlank()) {
+        val chordList = this.chords.split(" ")
+        val timeList = this.times.split(" ")
+
+        for (i in chordList.indices) {
+            if (chordList[i] == "N") continue
+            tempMap[(timeList[i].toFloat() * 10).toInt()] = chordList[i]
+        }
+    }
+
+    return UrlItem(
+        type = MusicType.URL,
+        url = this.url,
+        absolutePath = this.fileAbsolutePath,
+        fileName = this.fileName,
+        duration = this.duration,
+        lastModified = this.lastModified,
+        chordMap = tempMap.toMap()
     )
 }
 
