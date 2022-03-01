@@ -1,6 +1,8 @@
 package com.misaengfly.chordbox.player
 
+import android.media.AudioManager
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,7 +37,6 @@ class UrlChordFragment : Fragment() {
     private var timerTask: Timer? = null
     private val seekTime = 5000
 
-    // TODO( 해당 Item 클릭 시 빠르게 이동하도록 수정 필요 )
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -99,7 +100,9 @@ class UrlChordFragment : Fragment() {
     private fun startPlaying() {
         if (player != null) {
             stopPlaying()
+            player = null
         }
+
         player = MediaPlayer.create(requireContext(), R.raw.butter)
         timerTask = timer(period = 500) {
             val second = (((player!!.currentPosition + 400) / 1000))

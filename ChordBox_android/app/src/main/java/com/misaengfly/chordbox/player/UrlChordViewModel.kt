@@ -1,15 +1,25 @@
 package com.misaengfly.chordbox.player
 
 import android.app.Application
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.*
+import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.database.ChordDatabase
-import com.misaengfly.chordbox.musiclist.MusicItem
 import com.misaengfly.chordbox.musiclist.MusicListRepository
+import com.misaengfly.chordbox.network.BASE_URL
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.io.File
+
 
 class UrlChordViewModel(application: Application) :
     AndroidViewModel(application) {

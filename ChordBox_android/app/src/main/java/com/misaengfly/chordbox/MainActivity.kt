@@ -1,21 +1,26 @@
 package com.misaengfly.chordbox
 
+import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.webkit.URLUtil
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.musiclist.MusicListFragment
+import com.misaengfly.chordbox.network.BASE_URL
 import com.misaengfly.chordbox.network.FileApi
 import com.misaengfly.chordbox.network.RecordResponse
 import com.misaengfly.chordbox.network.UrlResponse
@@ -43,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this, viewModelFactory).get(UrlChordViewModel::class.java)
     }
 
+    @SuppressLint("HardwareIds")
     private fun getDeviceUuid(): String? {
         return Settings.Secure.getString(
             applicationContext.contentResolver,
@@ -101,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
                 saveUrlResultToDB(it, prefToken!!)
             } else {
-                saveResultToDB(it)
+                saveRecordResultToDB(it)
             }
         }
     }
@@ -110,7 +116,7 @@ class MainActivity : AppCompatActivity() {
      * Notification 클릭 시 DB에 결과 값 저장
      * @param path : 저장할 파일 이름
      * */
-    private fun saveResultToDB(fileName: String) {
+    private fun saveRecordResultToDB(fileName: String) {
         val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
         val prefToken = pref.getString("token", null)
 
@@ -179,6 +185,7 @@ class MainActivity : AppCompatActivity() {
                                 it.timeList,
                                 it.url
                             )
+                            downloadUrlFile(it.filePath)
                             moveUrlChordFragment(url)
                         }
                     }
@@ -188,6 +195,57 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Url Chord Download", t.toString())
                 }
             })
+    }
+
+    private var downloadId: Long = -1L
+    private lateinit var downloadManager: DownloadManager
+
+    private val onDownloadComplete = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.action)) {
+                if (downloadId == id) {
+                    val query: DownloadManager.Query = DownloadManager.Query()
+                    query.setFilterById(id)
+                    var cursor = downloadManager.query(query)
+                    if (!cursor.moveToFirst()) {
+                        return
+                    }
+
+                    var columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                    var status = cursor.getInt(columnIndex)
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        Toast.makeText(context, "Download succeeded", Toast.LENGTH_SHORT).show()
+                    } else if (status == DownloadManager.STATUS_FAILED) {
+                        Toast.makeText(context, "Download failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else if (DownloadManager.ACTION_NOTIFICATION_CLICKED == intent.action) {
+                Toast.makeText(context, "Notification clicked", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    suspend fun downloadUrlFile(filePath: String) {
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        intentFilter.addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED)
+        registerReceiver(onDownloadComplete, intentFilter)
+
+        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val file = File(getExternalFilesDir(null), filePath.split("/")[1])
+        val urlPath = "$BASE_URL/download?filename=${filePath.split("/")[1]}"
+
+        val request = DownloadManager.Request(Uri.parse(urlPath))
+            .setTitle("Downloading mp4 file")
+            .setDescription("Downloading")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            .setDestinationUri(Uri.fromFile(file))
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+
+        downloadId = downloadManager.enqueue(request)
+        Log.d("TAG", "path : " + file.path)
     }
 
     /**
@@ -206,17 +264,17 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_recent_box, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.list_action_alarm -> {
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.menu_recent_box, menu)
+//        return true
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        return when (item.itemId) {
+//            R.id.list_action_alarm -> {
+//                true
+//                }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//    }
 }
