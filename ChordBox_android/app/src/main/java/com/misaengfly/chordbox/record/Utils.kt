@@ -26,14 +26,17 @@ const val SEEK_OVER_AMOUNT = 5000
 
 val Context.recordFile: File
     get() {
-        val fileList = filesDir.listFiles { dir, name ->
-            name.contains("musicrecord")
-        }
+        val fileList = filesDir.listFiles { dir, name -> name.contains("musicrecord") }
 
-        val fileIndex = if (fileList.isNotEmpty()) {
-            fileList.last().absolutePath.toString().split("/").last().removePrefix("musicrecord")
-                .removeSuffix(".wav").toInt() + 1
-        } else 0
+        var fileIndex = 0
+        if (fileList.isNotEmpty()) {
+            fileList.map {
+                val tempIndex = it.absolutePath.split("/").last().removePrefix("musicrecord")
+                    .removeSuffix(".wav").toInt()
+
+                fileIndex = if (tempIndex >= fileIndex) tempIndex + 1 else fileIndex
+            }
+        }
 
         return File(filesDir, "musicrecord${fileIndex}.wav")
     }

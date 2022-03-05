@@ -183,7 +183,9 @@ class MainActivity : AppCompatActivity() {
                             urlViewModel.updateUrlItem(
                                 it.chordList,
                                 it.timeList,
-                                it.url
+                                it.url,
+                                it.filePath.split("/")[1],
+                                it.urlName
                             )
                             downloadUrlFile(it.filePath)
                             moveUrlChordFragment(url)
@@ -237,7 +239,7 @@ class MainActivity : AppCompatActivity() {
         val urlPath = "$BASE_URL/download?filename=${filePath.split("/")[1]}"
 
         val request = DownloadManager.Request(Uri.parse(urlPath))
-            .setTitle("Downloading mp4 file")
+            .setTitle("Downloading file")
             .setDescription("Downloading")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             .setDestinationUri(Uri.fromFile(file))

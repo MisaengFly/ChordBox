@@ -1,6 +1,5 @@
 package com.misaengfly.chordbox.player
 
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -8,14 +7,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.R
-import com.misaengfly.chordbox.ReadAssets
 import com.misaengfly.chordbox.databinding.FragmentUrlChordBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.*
 import kotlin.concurrent.timer
 
@@ -54,6 +52,10 @@ class UrlChordFragment : Fragment() {
         return binding.root
     }
 
+    // TODO (노티 안 눌러도 들어왔을 때 파일 다운 x 시 서버 확인 )
+    // TODO (화면 드로우와 파일 실행이 맞지 않음 )
+    // TODO (파일 실행 중지 버튼 추가 )
+    // TODO (version 28 이하부터 seekto 문제 있음 )
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -103,20 +105,39 @@ class UrlChordFragment : Fragment() {
             player = null
         }
 
-        player = MediaPlayer.create(requireContext(), R.raw.butter)
-        timerTask = timer(period = 500) {
-            val second = (((player!!.currentPosition + 400) / 1000))
-
-            Log.i("Timer : ", second.toString())
-
-            requireActivity().runOnUiThread {
-                adapter.selectedPosition = second
-                binding.urlMusicChordContainer.scrollToPosition(second)
-            }
+        var fileUrl = ""
+        var absolutePath = ""
+        viewModel.urlItem.value?.let {
+            fileUrl = "${requireContext().getExternalFilesDir(null)}/${it.absolutePath}"
+            absolutePath = it.absolutePath
         }
 
-        player!!.start()
-        binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_stop)
+        timerTask?.let {
+            it.cancel()
+        }
+        timerTask = null
+
+        if (absolutePath.isNotBlank() && File(fileUrl).exists()) {
+            player = MediaPlayer()
+            player?.apply {
+                setDataSource(requireContext(), Uri.parse(fileUrl))
+                setOnPreparedListener {
+                    timerTask = timer(period = 500) {
+                        val second = (((player!!.currentPosition + 400) / 1000))
+
+                        requireActivity().runOnUiThread {
+                            adapter.selectedPosition = second
+                            binding.urlMusicChordContainer.scrollToPosition(second)
+                        }
+                    }
+                    binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_stop)
+                    start()
+                }
+                prepare()
+            }
+        } else {
+            Toast.makeText(requireContext(), "Music can't be executed.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun stopPlaying() {
@@ -127,6 +148,7 @@ class UrlChordFragment : Fragment() {
         }
         player = null
         timerTask?.cancel()
+        timerTask = null
         binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_play)
     }
 

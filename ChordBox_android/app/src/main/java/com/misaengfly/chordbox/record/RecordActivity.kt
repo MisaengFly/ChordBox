@@ -29,6 +29,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.util.*
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -91,7 +93,8 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
         val file = File(recorder.filePath)
 
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("audiofile", (value + "_" +file.name), requestFile)
+        val body =
+            MultipartBody.Part.createFormData("audiofile", (value + "_" + file.name), requestFile)
 
         // DB에 저장
         viewModel.insertRecord(file.absolutePath, file.name)
@@ -108,10 +111,22 @@ class RecordActivity : AppCompatActivity(), StopDialog.StopDialogListener {
                     response: Response<FileResponse>
                 ) {
                     Log.d("callback success : ", response.message())
+                    if (!response.isSuccessful) {
+                        Toast.makeText(
+                            this@RecordActivity.applicationContext,
+                            "Code extraction failed.",
+                            Toast.LENGTH_LONG
+                        )
+                    }
                 }
 
                 override fun onFailure(call: Call<FileResponse>, t: Throwable) {
-                    Log.d("callback failure", t.toString())
+                    if (t is ConnectException) {
+                        Toast.makeText(
+                            this@RecordActivity.applicationContext,
+                            "Server upload fail.", Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             })
         dialog.dismiss()

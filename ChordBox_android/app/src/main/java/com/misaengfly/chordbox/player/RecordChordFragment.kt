@@ -26,6 +26,7 @@ class RecordChordFragment : Fragment() {
         ViewModelProvider(this, viewModelFactory).get(RecordChordViewModel::class.java)
     }
 
+    // TODO (노티 안 눌러도 들어왔을 때 파일 다운 x 시 서버 확인)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

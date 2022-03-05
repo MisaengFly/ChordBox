@@ -15,8 +15,14 @@ interface UrlDao {
     @Update
     suspend fun update(urlFile: UrlFile)
 
-    @Query("UPDATE url_table SET chords = :chords, times = :times WHERE url = :url")
-    suspend fun updateUrl(chords: String, times: String, url: String)
+    @Query("UPDATE url_table SET chords = :chords, times = :times, file_absolute_path = :filePath, fileName = :urlName  WHERE url = :url")
+    suspend fun updateUrl(
+        chords: String,
+        times: String,
+        url: String,
+        filePath: String,
+        urlName: String
+    )
 
     @Query("DELETE FROM url_table")
     suspend fun clearUrlTable()

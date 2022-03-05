@@ -43,7 +43,7 @@ fun UrlFile.asUrlItem(): UrlItem {
         type = MusicType.URL,
         url = this.url,
         absolutePath = this.fileAbsolutePath,
-        fileName = this.fileName,
+        urlName = this.fileName,
         duration = this.duration,
         lastModified = this.lastModified,
         chordMap = tempMap.toMap()

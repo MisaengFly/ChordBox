@@ -53,7 +53,8 @@ class SendUrlBottomSheet : BottomSheetDialogFragment() {
                 Toast.makeText(requireContext(), "Please Input the Youtube url", Toast.LENGTH_SHORT)
                     .show()
             } else if (viewModel.isExistUrl(urlString.toString())) {
-                Toast.makeText(requireContext(), "The url already exists!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "The url already exists!", Toast.LENGTH_LONG)
+                    .show()
             } else if (!Patterns.WEB_URL.matcher(urlString).matches()) {
                 Toast.makeText(requireContext(), "Please Input correct url", Toast.LENGTH_SHORT)
                     .show()

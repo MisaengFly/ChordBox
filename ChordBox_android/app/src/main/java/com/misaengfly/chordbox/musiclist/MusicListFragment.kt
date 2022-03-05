@@ -144,11 +144,6 @@ class MusicListFragment : Fragment() {
         popupMenu.show()
     }
 
-    override fun onStart() {
-        super.onStart()
-        androidViewModel.updateFiles()
-    }
-
     private fun replaceChordFragment(path: String) {
         val fragment = RecordChordFragment()
 

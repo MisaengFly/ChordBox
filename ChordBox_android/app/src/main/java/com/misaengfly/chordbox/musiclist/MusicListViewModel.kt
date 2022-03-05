@@ -31,17 +31,6 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
     val musicList: LiveData<List<MusicItem>>
         get() = _musicList
 
-//    private val _musicList = MutableLiveData<List<MusicItem>>()
-//    val musicList: LiveData<List<MusicItem>>
-//        get() = _musicList
-
-    init {
-        //_musicList.postValue(getWavFileList(application))
-    }
-
-    fun updateFiles() {
-//        _musicList.postValue(getWavFileList(mApplication))
-    }
 
     fun updateMusicList() {
         _musicList = CombinedLiveData(chordList, urlList) { data1, data2 ->
@@ -60,6 +49,7 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    // TODO ( Youtube MP4 FILE 지우기 )
     fun removeUrl(url: String) {
         viewModelScope.launch {
             musicListRepository.deleteUrl(url)
