@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -31,6 +33,8 @@ class UrlChordFragment : Fragment() {
 
     private var player: MediaPlayer? = null
     private var isPlaying = false
+    private var isPausing = false
+    private var isRePlaying = false
 
     private var timerTask: Timer? = null
     private val seekTime = 5000
@@ -54,7 +58,6 @@ class UrlChordFragment : Fragment() {
 
     // TODO (노티 안 눌러도 들어왔을 때 파일 다운 x 시 서버 확인 )
     // TODO (화면 드로우와 파일 실행이 맞지 않음 )
-    // TODO (파일 실행 중지 버튼 추가 )
     // TODO (version 28 이하부터 seekto 문제 있음 )
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,12 +75,31 @@ class UrlChordFragment : Fragment() {
         binding.urlMusicChordContainer.adapter = adapter
 
         binding.urlMusicPlayBtn.setOnClickListener {
-            if (isPlaying) {
+            isPlaying = true
+            isPausing = false
+            isRePlaying = false
+            startPlaying()
+        }
+
+        binding.urlMusicStopBtn.setOnClickListener {
+            isPlaying = false
+            isPausing = false
+            isRePlaying = false
+            stopPlaying()
+        }
+
+        binding.urlMusicPauseBtn.setOnClickListener {
+            if (isPlaying && !isPausing) {
+                // 실행 중
                 isPlaying = false
-                stopPlaying()
+                isPausing = true
+                isRePlaying = false
+                pausePlaying()
             } else {
+                // 멈춰짐
                 isPlaying = true
-                startPlaying()
+                isPausing = false
+                rePlaying()
             }
         }
 
@@ -130,7 +152,7 @@ class UrlChordFragment : Fragment() {
                             binding.urlMusicChordContainer.scrollToPosition(second)
                         }
                     }
-                    binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_stop)
+                    updateUI()
                     start()
                 }
                 prepare()
@@ -140,23 +162,51 @@ class UrlChordFragment : Fragment() {
         }
     }
 
+    private fun updateUI() {
+        if (isPlaying && !isPausing) {
+            if (isRePlaying) {
+                binding.urlMusicPauseBtn.setImageResource(R.drawable.ic_pause_outline_60)
+            }
+            // play
+            binding.urlMusicPlayBtn.visibility = GONE
+            binding.urlMusicPauseBtn.visibility = VISIBLE
+            binding.urlMusicStopBtn.visibility = VISIBLE
+        } else if (!isPlaying && !isPausing) {
+            // stop
+            binding.urlMusicPlayBtn.visibility = VISIBLE
+            binding.urlMusicPauseBtn.visibility = GONE
+            binding.urlMusicStopBtn.visibility = GONE
+        } else {
+            // pause
+            binding.urlMusicPauseBtn.setImageResource(R.drawable.ic_play)
+        }
+    }
+
     private fun stopPlaying() {
-        player.let {
+        player?.let {
             adapter.selectedPosition = 0
-            player?.stop()
-            player?.release()
+            it.stop()
+            it.release()
         }
         player = null
         timerTask?.cancel()
         timerTask = null
-        binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_play)
+        updateUI()
     }
 
     private fun pausePlaying() {
-        player.let {
-            it?.pause()
+        player?.let {
+            it.pause()
         }
-        binding.urlMusicPlayBtn.setImageResource(R.drawable.ic_play)
+        updateUI()
+    }
+
+    private fun rePlaying() {
+        isRePlaying = true
+        player?.let {
+            it.start()
+        }
+        updateUI()
     }
 
     override fun onDestroyView() {
