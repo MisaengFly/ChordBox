@@ -49,9 +49,16 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    // TODO ( Youtube MP4 FILE 지우기 )
     fun removeUrl(url: String) {
         viewModelScope.launch {
+            val urlInfo = musicListRepository.findUrl(url)
+            urlInfo?.let {
+                val file = File(
+                    getApplication<Application>().applicationContext.getExternalFilesDir(null),
+                    it.absolutePath
+                )
+                file.delete()
+            }
             musicListRepository.deleteUrl(url)
             updateMusicList()
         }
