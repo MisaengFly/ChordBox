@@ -22,6 +22,18 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
             notifyDataSetChanged()
         }
 
+    fun moveForward() {
+        selectedPosition += 5
+        notifyDataSetChanged()
+    }
+
+    fun moveBackward() {
+        selectedPosition -= 5
+        if (selectedPosition < 0)
+            selectedPosition = 0
+        notifyDataSetChanged()
+    }
+
     class ViewHolder private constructor(val binding: ItemUrlChordBinding) :
         RecyclerView.ViewHolder(binding.root) {
 

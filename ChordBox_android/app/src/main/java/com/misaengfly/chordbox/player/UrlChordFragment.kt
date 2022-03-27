@@ -108,7 +108,8 @@ class UrlChordFragment : Fragment() {
                 val curPosition = player!!.currentPosition
                 val millisecond = curPosition + seekTime
                 player!!.seekTo(millisecond)
-                adapter.selectedPosition = (((millisecond + 400) / 1000))
+                adapter.moveForward()
+//                adapter.selectedPosition = (((millisecond + 400) / 1000))
             }
         }
 
@@ -116,7 +117,8 @@ class UrlChordFragment : Fragment() {
             val curPosition = player!!.currentPosition
             var millisecond = if (curPosition - seekTime < 0) 0 else curPosition - seekTime
             player!!.seekTo(millisecond)
-            adapter.selectedPosition = (((millisecond + 400) / 1000))
+            adapter.moveBackward()
+//            adapter.selectedPosition = (((millisecond + 400) / 1000))
         }
 
     }
@@ -145,11 +147,13 @@ class UrlChordFragment : Fragment() {
                 setDataSource(requireContext(), Uri.parse(fileUrl))
                 setOnPreparedListener {
                     timerTask = timer(period = 500) {
-                        val second = (((player!!.currentPosition + 400) / 1000))
+//                        val second = (((player!!.currentPosition + 400) / 1000))
 
                         requireActivity().runOnUiThread {
-                            adapter.selectedPosition = second
-                            binding.urlMusicChordContainer.scrollToPosition(second)
+                            adapter.moveForward()
+                            binding.urlMusicChordContainer.scrollToPosition(adapter.selectedPosition)
+//                            adapter.selectedPosition = second
+//                            binding.urlMusicChordContainer.scrollToPosition(second)
                         }
                     }
                     updateUI()
@@ -188,9 +192,9 @@ class UrlChordFragment : Fragment() {
             it.stop()
             it.release()
         }
-        player = null
         timerTask?.cancel()
         timerTask = null
+        player = null
         updateUI()
     }
 
