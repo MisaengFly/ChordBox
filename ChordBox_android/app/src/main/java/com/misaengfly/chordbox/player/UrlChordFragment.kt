@@ -1,5 +1,6 @@
 package com.misaengfly.chordbox.player
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -50,13 +51,14 @@ class UrlChordFragment : Fragment() {
         val url = bundle?.getString("Url").toString()
 
         runBlocking {
-            viewModel.findUrlItem(url)
+            val pref = requireActivity().getSharedPreferences("token", Context.MODE_PRIVATE)
+            val prefToken = pref.getString("token", "")
+            viewModel.findUrlItem(url, prefToken!!)
         }
 
         return binding.root
     }
 
-    // TODO (노티 안 눌러도 들어왔을 때 파일 다운 x 시 서버 확인 )
     // TODO (화면 드로우와 파일 실행이 맞지 않음 )
     // TODO (version 28 이하부터 seekto 문제 있음 )
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
