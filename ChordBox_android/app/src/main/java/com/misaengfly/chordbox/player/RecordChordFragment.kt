@@ -1,9 +1,11 @@
 package com.misaengfly.chordbox.player
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -31,17 +33,26 @@ class RecordChordFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentChordBinding.inflate(inflater, container, false)
         chordBinding = binding
 
         val bundle = arguments
         filePath = bundle?.getString("Path").toString()
 
-        binding.musicNameTv.text = File(filePath).name
-        binding.musicDateTv.text = File(filePath).lastModified().convertLongToDateTime()
+        val file = File(filePath)
+        binding.musicNameTv.text = file.name
+        binding.musicDateTv.text = file.lastModified().convertLongToDateTime()
 
-        viewModel.findRecordItem(filePath)
+        val pref = requireActivity().getSharedPreferences("token", Context.MODE_PRIVATE)
+        val prefToken = pref.getString("token", "")
+        viewModel.token = prefToken!!
+
+        val sharedPreference = requireActivity().getSharedPreferences("SP", AppCompatActivity.MODE_PRIVATE)
+        val value = sharedPreference.getString("uuid", "")
+        viewModel.uuid = value!!
+
+        viewModel.findRecordItem(filePath, file.name)
 
         return binding.root
     }

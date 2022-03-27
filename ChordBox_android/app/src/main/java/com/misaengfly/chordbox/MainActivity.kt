@@ -37,12 +37,6 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: RecordViewModel by lazy {
-        val dataSource = ChordDatabase.getInstance(this.application).recordDao
-        val viewModelFactory = RecordViewModelFactory(dataSource, this.application)
-        ViewModelProvider(this, viewModelFactory).get(RecordViewModel::class.java)
-    }
-
     private val urlViewModel: UrlChordViewModel by lazy {
         val viewModelFactory = UrlChordViewModel.Factory(application)
         ViewModelProvider(this, viewModelFactory).get(UrlChordViewModel::class.java)
@@ -107,44 +101,10 @@ class MainActivity : AppCompatActivity() {
 
                 saveUrlResultToDB(it, prefToken!!)
             } else {
-                saveRecordResultToDB(it)
+                val filePath = filesDir.absolutePath.toString() + "/" + it
+                moveChordFragment(filePath)
             }
         }
-    }
-
-    /**
-     * Notification 클릭 시 DB에 결과 값 저장
-     * @param path : 저장할 파일 이름
-     * */
-    private fun saveRecordResultToDB(fileName: String) {
-        val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
-        val prefToken = pref.getString("token", null)
-
-        val sharedPreference = getSharedPreferences("SP", MODE_PRIVATE)
-        val value = sharedPreference.getString("uuid", null)
-        val sendFileName = (value + "_" + fileName)
-
-        val filePath = filesDir.absolutePath.toString() + "/" + fileName
-
-        FileApi.retrofitService.getRecordChord(sendFileName, prefToken!!)
-            .enqueue(object : Callback<RecordResponse> {
-                override fun onResponse(
-                    call: Call<RecordResponse>,
-                    response: Response<RecordResponse>
-                ) {
-                    Log.d("Record Chord Download", response.message())
-                    response.body()?.let {
-                        lifecycleScope.launch {
-                            viewModel.updateRecord(it.chordList, it.timeList, filePath)
-                            moveChordFragment(filePath)
-                        }
-                    }
-                }
-
-                override fun onFailure(call: Call<RecordResponse>, t: Throwable) {
-                    Log.d("Record Chord Download", t.toString())
-                }
-            })
     }
 
     /**
@@ -163,7 +123,6 @@ class MainActivity : AppCompatActivity() {
         transaction.addToBackStack(null)
         transaction.commit()
     }
-
 
     /**
      * Notification 클릭 시 DB에 결과 값 저장
@@ -205,7 +164,7 @@ class MainActivity : AppCompatActivity() {
     private val onDownloadComplete = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.action)) {
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == intent.action) {
                 if (downloadId == id) {
                     val query: DownloadManager.Query = DownloadManager.Query()
                     query.setFilterById(id)
