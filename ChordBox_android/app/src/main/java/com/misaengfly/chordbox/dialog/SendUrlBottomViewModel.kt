@@ -40,7 +40,7 @@ class SendUrlBottomViewModel(application: Application) :
     fun isExistUrl(url: String): Boolean {
         return runBlocking {
             val musicItem = musicListRepository.findUrl(url)
-            musicItem != null
+            musicItem.value != null
         }
     }
 

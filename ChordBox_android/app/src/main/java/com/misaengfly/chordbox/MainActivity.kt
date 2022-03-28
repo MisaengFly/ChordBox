@@ -37,11 +37,6 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    private val urlViewModel: UrlChordViewModel by lazy {
-        val viewModelFactory = UrlChordViewModel.Factory(application)
-        ViewModelProvider(this, viewModelFactory).get(UrlChordViewModel::class.java)
-    }
-
     @SuppressLint("HardwareIds")
     private fun getDeviceUuid(): String? {
         return Settings.Secure.getString(

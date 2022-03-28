@@ -58,7 +58,7 @@ class RecordChordViewModel(application: Application) :
         runBlocking {
             val record = database.recordDao.getRecord(filePath)
 
-            // TODO ( update 되자마자 바로 View에 반영할 수 있도록 수정 )
+            // TODO ( update 되자마자 바로 View 에 반영할 수 있도록 수정 )
             // TODO ( 로딩 중 화면 보이면서 로딩하도록 )
             if (record?.chords == "") {
                 updateRecordItem(filePath, fileName)

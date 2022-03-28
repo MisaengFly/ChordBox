@@ -52,7 +52,7 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
     fun removeUrl(url: String) {
         viewModelScope.launch {
             val urlInfo = musicListRepository.findUrl(url)
-            urlInfo?.let {
+            urlInfo.value?.let {
                 val file = File(
                     getApplication<Application>().applicationContext.getExternalFilesDir(null),
                     it.absolutePath

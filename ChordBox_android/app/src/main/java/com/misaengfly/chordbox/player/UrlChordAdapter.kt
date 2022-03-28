@@ -2,6 +2,7 @@ package com.misaengfly.chordbox.player
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -18,17 +19,18 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
 
     var selectedPosition = 0
         set(value) {
+            Log.d("Adapter : ", value.toString())
             field = value
             notifyDataSetChanged()
         }
 
-    fun moveForward() {
-        selectedPosition += 5
+    fun moveForward(diff: Int) {
+        selectedPosition += diff
         notifyDataSetChanged()
     }
 
-    fun moveBackward() {
-        selectedPosition -= 5
+    fun moveBackward(diff: Int) {
+        selectedPosition -= diff
         if (selectedPosition < 0)
             selectedPosition = 0
         notifyDataSetChanged()

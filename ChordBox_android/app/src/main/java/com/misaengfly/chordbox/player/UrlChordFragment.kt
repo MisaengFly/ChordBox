@@ -24,9 +24,11 @@ class UrlChordFragment : Fragment() {
     private var urlChordBinding: FragmentUrlChordBinding? = null
     private val binding get() = urlChordBinding!!
 
+    private lateinit var url: String
+    private lateinit var prefToken: String
     private val viewModel: UrlChordViewModel by lazy {
         val viewModelFactory =
-            UrlChordViewModel.Factory(requireActivity().application)
+            UrlChordViewModel.Factory(requireActivity().application, url)
         ViewModelProvider(this, viewModelFactory).get(UrlChordViewModel::class.java)
     }
 
@@ -48,18 +50,13 @@ class UrlChordFragment : Fragment() {
         urlChordBinding = FragmentUrlChordBinding.inflate(LayoutInflater.from(context))
 
         val bundle = arguments
-        val url = bundle?.getString("Url").toString()
-
-        runBlocking {
-            val pref = requireActivity().getSharedPreferences("token", Context.MODE_PRIVATE)
-            val prefToken = pref.getString("token", "")
-            viewModel.findUrlItem(url, prefToken!!)
-        }
+        url = bundle?.getString("Url").toString()
+        val pref = requireActivity().getSharedPreferences("token", Context.MODE_PRIVATE)
+        prefToken = pref.getString("token", "")!!
 
         return binding.root
     }
 
-    // TODO (화면 드로우와 파일 실행이 맞지 않음 )
     // TODO (version 28 이하부터 seekto 문제 있음 )
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,6 +65,8 @@ class UrlChordFragment : Fragment() {
 
         viewModel.urlItem.observe(viewLifecycleOwner) {
             it?.let {
+                viewModel.findUrlItem(url, prefToken)
+
                 Log.d("log", it.chordMap.size.toString())
                 binding.urlMusicNameTv.text = it.url
                 binding.urlMusicDateTv.text = it.lastModified
@@ -110,7 +109,7 @@ class UrlChordFragment : Fragment() {
                 val curPosition = player!!.currentPosition
                 val millisecond = curPosition + seekTime
                 player!!.seekTo(millisecond)
-                adapter.moveForward()
+                adapter.moveForward(50)
 //                adapter.selectedPosition = (((millisecond + 400) / 1000))
             }
         }
@@ -119,7 +118,7 @@ class UrlChordFragment : Fragment() {
             val curPosition = player!!.currentPosition
             var millisecond = if (curPosition - seekTime < 0) 0 else curPosition - seekTime
             player!!.seekTo(millisecond)
-            adapter.moveBackward()
+            adapter.moveBackward(50)
 //            adapter.selectedPosition = (((millisecond + 400) / 1000))
         }
 
@@ -150,12 +149,12 @@ class UrlChordFragment : Fragment() {
                 setOnPreparedListener {
                     timerTask = timer(period = 500) {
 //                        val second = (((player!!.currentPosition + 400) / 1000))
+                        val second = (((player!!.currentPosition) / 500))
+//                        Log.d("Timer : ", second.toString())
 
                         requireActivity().runOnUiThread {
-                            adapter.moveForward()
+                            adapter.selectedPosition = (second * 5)
                             binding.urlMusicChordContainer.scrollToPosition(adapter.selectedPosition)
-//                            adapter.selectedPosition = second
-//                            binding.urlMusicChordContainer.scrollToPosition(second)
                         }
                     }
                     updateUI()

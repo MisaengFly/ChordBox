@@ -34,5 +34,5 @@ interface UrlDao {
     fun getUrlFiles(): LiveData<List<UrlFile>>
 
     @Query("SELECT * FROM url_table WHERE url = :key")
-    suspend fun getUrlFile(key: String): UrlFile?
+    fun getUrlFile(key: String): LiveData<UrlFile?>
 }

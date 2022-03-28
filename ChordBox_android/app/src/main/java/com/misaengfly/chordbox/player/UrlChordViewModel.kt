@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.*
 import com.misaengfly.chordbox.database.ChordDatabase
+import com.misaengfly.chordbox.database.UrlFile
+import com.misaengfly.chordbox.database.asUrlItem
 import com.misaengfly.chordbox.musiclist.MusicListRepository
 import com.misaengfly.chordbox.network.BASE_URL
 import com.misaengfly.chordbox.network.FileApi
@@ -24,13 +26,15 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
-class UrlChordViewModel(application: Application) :
+class UrlChordViewModel(application: Application, url: String) :
     AndroidViewModel(application) {
 
     private val database = ChordDatabase.getInstance(application)
     private val musicListRepository = MusicListRepository(database)
 
-    val urlItem = MutableLiveData<UrlItem?>()
+    private var _urlItem: MutableLiveData<UrlItem?> =
+        musicListRepository.findUrl(url) as MutableLiveData<UrlItem?>
+    val urlItem get() = _urlItem
 
     /**
      * Record_table의 데이터 업데이트
@@ -45,17 +49,10 @@ class UrlChordViewModel(application: Application) :
         musicListRepository.updateUrl(chords, times, url, filePath, urlName)
     }
 
-    suspend fun findUrlItem(url: String, prefToken: String) = withContext(Dispatchers.IO) {
-        val res = musicListRepository.findUrl(url)
-
-        // TODO ( update 되자마자 바로 View에 반영할 수 있도록 수정 )
+    fun findUrlItem(url: String, prefToken: String) {
         // TODO ( 로딩 중 화면 보이면서 로딩하도록 )
-        if (res?.absolutePath.isNullOrEmpty()) {
+        if (_urlItem.value?.absolutePath.isNullOrEmpty()) {
             saveUrlResultToDB(url, prefToken)
-        }
-
-        res?.let {
-            urlItem.postValue(it)
         }
     }
 
@@ -64,7 +61,7 @@ class UrlChordViewModel(application: Application) :
      * @param path : 저장할 파일 이름
      * */
     private fun saveUrlResultToDB(url: String, prefToken: String) {
-        FileApi.retrofitService.getUrlChord(url, prefToken!!)
+        FileApi.retrofitService.getUrlChord(url, prefToken)
             .enqueue(object : Callback<UrlResponse> {
                 override fun onResponse(
                     call: Call<UrlResponse>,
@@ -153,12 +150,12 @@ class UrlChordViewModel(application: Application) :
     /**
      * Factory
      **/
-    class Factory(private val app: Application) :
+    class Factory(private val app: Application, private val url: String) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(UrlChordViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return UrlChordViewModel(app) as T
+                return UrlChordViewModel(app, url) as T
             }
             throw IllegalArgumentException("Unable to construct viewModel")
         }
