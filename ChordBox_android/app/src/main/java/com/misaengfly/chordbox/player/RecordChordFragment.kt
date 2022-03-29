@@ -24,7 +24,7 @@ class RecordChordFragment : Fragment() {
 
     private val viewModel: RecordChordViewModel by lazy {
         val viewModelFactory =
-            RecordChordViewModel.Factory(requireActivity().application)
+            RecordChordViewModel.Factory(requireActivity().application, filePath)
         ViewModelProvider(this, viewModelFactory).get(RecordChordViewModel::class.java)
     }
 
@@ -47,11 +47,14 @@ class RecordChordFragment : Fragment() {
         val prefToken = pref.getString("token", "")
         viewModel.token = prefToken!!
 
-        val sharedPreference = requireActivity().getSharedPreferences("SP", AppCompatActivity.MODE_PRIVATE)
+        val sharedPreference =
+            requireActivity().getSharedPreferences("SP", AppCompatActivity.MODE_PRIVATE)
         val value = sharedPreference.getString("uuid", "")
         viewModel.uuid = value!!
 
-        viewModel.findRecordItem(filePath, file.name)
+        viewModel.record.observe(viewLifecycleOwner) {
+            viewModel.findRecordItem(filePath, file.name)
+        }
 
         return binding.root
     }

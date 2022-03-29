@@ -21,7 +21,7 @@ import kotlin.collections.indices
 import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
-class RecordChordViewModel(application: Application) :
+class RecordChordViewModel(application: Application, filePath: String) :
     AndroidViewModel(application) {
 
     private val database = ChordDatabase.getInstance(application)
@@ -30,6 +30,8 @@ class RecordChordViewModel(application: Application) :
     var token: String = ""
 
     var chordMap: MutableMap<Int, String> = mutableMapOf()
+
+    var record = database.recordDao.getRecord(filePath)
 
     private fun updateRecordItem(filePath: String, fileName: String) {
         val sendFileName = (uuid + "_" + fileName)
@@ -56,15 +58,13 @@ class RecordChordViewModel(application: Application) :
 
     fun findRecordItem(filePath: String, fileName: String) {
         runBlocking {
-            val record = database.recordDao.getRecord(filePath)
 
-            // TODO ( update 되자마자 바로 View 에 반영할 수 있도록 수정 )
             // TODO ( 로딩 중 화면 보이면서 로딩하도록 )
-            if (record?.chords == "") {
+            if (record.value?.chords == "") {
                 updateRecordItem(filePath, fileName)
             }
 
-            record?.let {
+            record.value?.let {
                 val chordList = it.chords.split(" ")
                 val timeList = it.times.split(" ")
                 var value = 0
@@ -84,12 +84,12 @@ class RecordChordViewModel(application: Application) :
     /**
      * Factory
      **/
-    class Factory(private val app: Application) :
+    class Factory(private val app: Application, private val filePath: String) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(RecordChordViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return RecordChordViewModel(app) as T
+                return RecordChordViewModel(app, filePath) as T
             }
             throw IllegalArgumentException("Unable to construct viewModel")
         }

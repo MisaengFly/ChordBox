@@ -40,6 +40,7 @@
         android:layout_marginBottom="64dp"
         android:text="We'll let you know when the delivery is complete."
         android:textSize="16sp"
+        android:gravity="center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

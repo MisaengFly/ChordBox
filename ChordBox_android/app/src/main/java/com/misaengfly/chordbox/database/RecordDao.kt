@@ -24,7 +24,7 @@ interface RecordDao {
     fun getRecords(): LiveData<List<Record>>
 
     @Query("SELECT * FROM record_table WHERE file_absolute_path = :key")
-    suspend fun getRecord(key: String): Record?
+    fun getRecord(key: String): LiveData<Record?>
 
     @Query("SELECT * FROM record_table ORDER BY fileName DESC LIMIT 1")
     suspend fun getOne(): Record?

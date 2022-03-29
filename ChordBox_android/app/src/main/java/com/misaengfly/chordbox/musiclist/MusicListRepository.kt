@@ -54,6 +54,10 @@ class MusicListRepository(private val database: ChordDatabase) {
         }
     }
 
+    suspend fun isExistUrl(url: String): UrlFile?  {
+        return database.urlDao.isExistUrlFile(url)
+    }
+
     suspend fun updateUrl(
         chords: String,
         times: String,

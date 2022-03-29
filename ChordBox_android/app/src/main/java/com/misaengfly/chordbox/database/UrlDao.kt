@@ -35,4 +35,7 @@ interface UrlDao {
 
     @Query("SELECT * FROM url_table WHERE url = :key")
     fun getUrlFile(key: String): LiveData<UrlFile?>
+
+    @Query("SELECT * FROM url_table WHERE url = :key")
+    suspend fun isExistUrlFile(key: String): UrlFile?
 }
