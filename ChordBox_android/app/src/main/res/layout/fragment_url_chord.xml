@@ -12,14 +12,18 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
         android:text="Music Name"
-        android:textSize="25sp"
+        android:textSize="25dp"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpUsage" />
 
     <TextView
         android:id="@+id/url_music_date_tv"
@@ -27,19 +31,21 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Music Created Date"
+        android:textSize="14dp"
         app:layout_constraintStart_toStartOf="@+id/url_music_name_tv"
-        app:layout_constraintTop_toBottomOf="@+id/url_music_name_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/url_music_name_tv"
+        tools:ignore="SpUsage" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/url_music_chord_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
         android:background="@drawable/bg_url_chord_rv"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/url_music_play_btn"
+        app:layout_constraintBottom_toTopOf="@+id/url_music_backward_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/url_music_date_tv"

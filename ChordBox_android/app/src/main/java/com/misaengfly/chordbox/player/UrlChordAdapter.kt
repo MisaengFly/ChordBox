@@ -49,9 +49,7 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
         fun bindSelected(chord: String) {
             binding.itemUrlTv.apply {
                 text = chord
-                background = ContextCompat.getDrawable(
-                    binding.root.context, R.drawable.bg_url_selected_item
-                )
+                setBackgroundColor(Color.parseColor("#CD073C"))
             }
         }
 
@@ -75,7 +73,7 @@ class UrlChordAdapter : RecyclerView.Adapter<UrlChordAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val param = if (data.containsKey(position)) data[position]!! else ""
 
-        if (selectedPosition == position)
+        if (position >= selectedPosition && position < (selectedPosition + 5))
             holder.bindSelected(param)
         else
             holder.bind(param)

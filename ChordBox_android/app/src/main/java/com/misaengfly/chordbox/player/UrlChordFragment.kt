@@ -1,6 +1,7 @@
 package com.misaengfly.chordbox.player
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -15,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.databinding.FragmentUrlChordBinding
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.*
 import kotlin.concurrent.timer
@@ -57,18 +57,24 @@ class UrlChordFragment : Fragment() {
         return binding.root
     }
 
-    // TODO (version 28 이하부터 seekto 문제 있음 )
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = UrlChordAdapter()
+
+        binding.urlMusicNameTv.isSelected = true
 
         viewModel.urlItem.observe(viewLifecycleOwner) {
             it?.let {
                 viewModel.findUrlItem(url, prefToken)
 
                 Log.d("log", it.chordMap.size.toString())
-                binding.urlMusicNameTv.text = it.url
+
+                if (it.urlName.isBlank()) {
+                    binding.urlMusicNameTv.text = it.url
+                } else {
+                    binding.urlMusicNameTv.text = it.urlName.substring(0, it.urlName.length - 4)
+                }
                 binding.urlMusicDateTv.text = it.lastModified
                 adapter.data = it.chordMap
             }
@@ -110,7 +116,6 @@ class UrlChordFragment : Fragment() {
                 val millisecond = curPosition + seekTime
                 player!!.seekTo(millisecond)
                 adapter.moveForward(50)
-//                adapter.selectedPosition = (((millisecond + 400) / 1000))
             }
         }
 
@@ -119,12 +124,13 @@ class UrlChordFragment : Fragment() {
             var millisecond = if (curPosition - seekTime < 0) 0 else curPosition - seekTime
             player!!.seekTo(millisecond)
             adapter.moveBackward(50)
-//            adapter.selectedPosition = (((millisecond + 400) / 1000))
         }
 
     }
 
     private fun startPlaying() {
+        binding.urlMusicNameTv.isSelected = false
+
         if (player != null) {
             stopPlaying()
             player = null
@@ -146,6 +152,12 @@ class UrlChordFragment : Fragment() {
             player = MediaPlayer()
             player?.apply {
                 setDataSource(requireContext(), Uri.parse(fileUrl))
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
                 setOnPreparedListener {
                     timerTask = timer(period = 500) {
 //                        val second = (((player!!.currentPosition + 400) / 1000))
@@ -188,6 +200,8 @@ class UrlChordFragment : Fragment() {
     }
 
     private fun stopPlaying() {
+        binding.urlMusicNameTv.isSelected = true
+
         player?.let {
             adapter.selectedPosition = 0
             it.stop()
@@ -200,13 +214,14 @@ class UrlChordFragment : Fragment() {
     }
 
     private fun pausePlaying() {
+        binding.urlMusicNameTv.isSelected = false
         player?.let {
             it.pause()
         }
         updateUI()
     }
-
     private fun rePlaying() {
+        binding.urlMusicNameTv.isSelected = false
         isRePlaying = true
         player?.let {
             it.start()
