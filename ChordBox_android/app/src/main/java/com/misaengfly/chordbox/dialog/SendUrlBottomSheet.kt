@@ -67,18 +67,8 @@ class SendUrlBottomSheet : BottomSheetDialogFragment() {
                 viewModel.insertUrlToDB(urlString.toString())
 
                 // 2. 서버에 저장
-                FileApi.retrofitService.sendYoutubeUrl(urlString.toString(), prefToken!!)
-                    .enqueue(object : Callback<Unit> {
-                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                            Log.d("Send URL cb success : ", response.message())
-                            dismiss()
-                        }
-
-                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-                            Log.d("Send URL cb failure", t.toString())
-                            dismiss()
-                        }
-                    })
+                viewModel.sendUrlToServer(urlString.toString(), prefToken!!)
+                dismiss()
             }
         }
     }

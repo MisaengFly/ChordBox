@@ -1,6 +1,7 @@
 package com.misaengfly.chordbox.dialog
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,8 +10,12 @@ import com.misaengfly.chordbox.database.ChordDatabase
 import com.misaengfly.chordbox.database.UrlFile
 import com.misaengfly.chordbox.musiclist.MusicItem
 import com.misaengfly.chordbox.musiclist.MusicListRepository
+import com.misaengfly.chordbox.network.FileApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,6 +39,24 @@ class SendUrlBottomViewModel(application: Application) :
                 curTime
             )
             musicListRepository.insertUrl(urlInfo)
+        }
+    }
+
+    /**
+     * 서버로 url 전송
+     **/
+    fun sendUrlToServer(url: String, prefToken: String) {
+        viewModelScope.launch {
+            FileApi.retrofitService.sendYoutubeUrl(url, prefToken)
+                .enqueue(object : Callback<Unit> {
+                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                        Log.d("Send URL cb success : ", response.message())
+                    }
+
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        Log.d("Send URL cb failure", t.toString())
+                    }
+                })
         }
     }
 
