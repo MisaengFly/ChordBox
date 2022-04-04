@@ -29,7 +29,7 @@ class RecordChordViewModel(application: Application, filePath: String) :
     var uuid: String = ""
     var token: String = ""
 
-    var chordMap: MutableMap<Int, String> = mutableMapOf()
+    var chordMap: MutableMap<Int, Pair<String, Boolean>> = mutableMapOf()
 
     var record = database.recordDao.getRecord(filePath)
 
@@ -64,6 +64,7 @@ class RecordChordViewModel(application: Application, filePath: String) :
                 updateRecordItem(filePath, fileName)
             }
 
+            var flag = false
             record.value?.let {
                 val chordList = it.chords.split(" ")
                 val timeList = it.times.split(" ")
@@ -74,7 +75,8 @@ class RecordChordViewModel(application: Application, filePath: String) :
                         if (chordList[i] == "N") continue
 
                         value = (timeList[i].toFloat() * 10).toInt()
-                        chordMap[value] = chordList[i]
+                        chordMap[value] = (chordList[i] to flag)
+                        flag = !flag
                     }
                 }
             }

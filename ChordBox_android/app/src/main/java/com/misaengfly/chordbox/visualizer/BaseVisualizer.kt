@@ -8,6 +8,7 @@ import android.view.View
 import com.misaengfly.chordbox.R
 import com.misaengfly.chordbox.record.dpToPx
 import com.misaengfly.chordbox.record.getColorCompat
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -67,7 +68,7 @@ open class BaseVisualizer : View {
     private var bottomIdx: Int = 0
 
     protected var timeStampDrawable: Boolean = false
-    protected lateinit var chordDrawMap: Map<Int, String>
+    protected lateinit var chordDrawMap: Map<Int, Pair<String, Boolean>>
 
     private fun init() {
         backgroundBarPrimeColor = Paint()
@@ -134,24 +135,20 @@ open class BaseVisualizer : View {
             // 그려줘야 할 코드 체크하는 용도
             val drawCheck = Array((getEndBar() / 40 + 1) * 10) { false }
 
-            val mtickDuration = tickDuration / 10
+            val mTickDuration = tickDuration / 10
 
             for (i in getStartBar() until getEndBar()) {
                 val startX = width / 2 - (getBarPosition() - i) * (barWidth + spaceBetweenBar)
                 drawStraightBar(canvas, startX, getBarHeightAt(i).toInt(), getBaseLine())
 
-//                if (timeStampDrawable && !drawCheck[(i / tickDuration)]) {
-                if (timeStampDrawable && !drawCheck[(i / mtickDuration)]) {
+                if (timeStampDrawable && !drawCheck[(i / mTickDuration)]) {
                     // 코드 뒤로 밀리는것 방지
-//                    if ((i % tickDuration) > 2) {
-                    if ((i % mtickDuration) > 2) {
-//                        drawCheck[(i / tickDuration)] = true
-                        drawCheck[(i / mtickDuration)] = true
+                    if ((i % mTickDuration) > 2) {
+                        drawCheck[(i / mTickDuration)] = true
                         continue
                     }
 
-//                    bottomIdx = (i / tickDuration)
-                    bottomIdx = (i / mtickDuration)
+                    bottomIdx = (i / mTickDuration)
                     val timeBaseLine = (getBaseLine() * 2).toFloat()
                     canvas.drawLine(
                         startX,
@@ -161,14 +158,23 @@ open class BaseVisualizer : View {
                         bottomBarPaint
                     )
 
-
                     if (chordDrawMap.containsKey(bottomIdx)) {
-                        canvas.drawText(
-                            chordDrawMap[bottomIdx]!!,
-                            startX - 50f,
-                            timeBaseLine - 60f,
-                            bottomTextPaint
-                        )
+                        val currentChord = chordDrawMap[bottomIdx]!!
+                        if (currentChord.second) {
+                            canvas.drawText(
+                                currentChord.first,
+                                startX - 50f,
+                                timeBaseLine - 60f,
+                                bottomTextPaint
+                            )
+                        } else {
+                            canvas.drawText(
+                                currentChord.first,
+                                startX - 50f,
+                                timeBaseLine - 150f,
+                                bottomTextPaint
+                            )
+                        }
                     }
                     drawCheck[bottomIdx] = true
                 }
