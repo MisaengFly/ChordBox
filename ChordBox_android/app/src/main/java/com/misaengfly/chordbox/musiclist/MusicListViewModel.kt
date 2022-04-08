@@ -63,40 +63,4 @@ class MusicListViewModel(application: Application) : AndroidViewModel(applicatio
             updateMusicList()
         }
     }
-
-    /**
-     * 저장소에서 파일 불러와서 변환
-     * */
-    private fun getWavFileList(application: Application): ArrayList<MusicItem> {
-        // 파일 얻어오기 - wav 확장자인 파일만 가능
-        val fileList = application.filesDir.listFiles(FileFilter {
-            it.extension == "wav"
-        })
-        val musicItemList = arrayListOf<MusicItem>()
-
-//        for (file in fileList) {
-//            musicItemList.add(
-//                MusicItem(
-//                    MusicType.RECORD,
-//                    file.absolutePath,
-//                    file.name,
-//                    getFileDuration(file),
-//                    file.lastModified().convertLongToDateTime(),
-//                    mapOf()
-//                )
-//            )
-//        }
-        return musicItemList
-    }
-
-    /**
-     * Click 시 코드(Chord) 페이지로 이동
-     * true일 경우 이동
-     * */
-    private val _moveToMusicChord = MutableLiveData<Boolean>()
-    val moveToMusicChord: LiveData<Boolean> get() = _moveToMusicChord
-
-    fun doMoveToMusicChord() {
-        _moveToMusicChord.value = true
-    }
 }

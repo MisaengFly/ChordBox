@@ -144,7 +144,7 @@ class UrlChordViewModel(application: Application, url: String) :
             .setAllowedOverRoaming(true)
 
         downloadId = downloadManager.enqueue(request)
-        Log.d("TAG", "path : " + file.path)
+        //Log.d("TAG", "path : " + file.path)
     }
 
     /**

@@ -121,7 +121,7 @@ class UrlChordFragment : Fragment() {
 
         binding.urlMusicBackwardBtn.setOnClickListener {
             val curPosition = player!!.currentPosition
-            var millisecond = if (curPosition - seekTime < 0) 0 else curPosition - seekTime
+            val millisecond = if (curPosition - seekTime < 0) 0 else curPosition - seekTime
             player!!.seekTo(millisecond)
             adapter.moveBackward(50)
         }
@@ -143,9 +143,7 @@ class UrlChordFragment : Fragment() {
             absolutePath = it.absolutePath
         }
 
-        timerTask?.let {
-            it.cancel()
-        }
+        timerTask?.cancel()
         timerTask = null
 
         if (absolutePath.isNotBlank() && File(fileUrl).exists()) {
@@ -215,17 +213,13 @@ class UrlChordFragment : Fragment() {
 
     private fun pausePlaying() {
         binding.urlMusicNameTv.isSelected = false
-        player?.let {
-            it.pause()
-        }
+        player?.pause()
         updateUI()
     }
     private fun rePlaying() {
         binding.urlMusicNameTv.isSelected = false
         isRePlaying = true
-        player?.let {
-            it.start()
-        }
+        player?.start()
         updateUI()
     }
 
