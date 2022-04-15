@@ -3,7 +3,7 @@ package com.misaengfly.chordbox.visualizer
 import android.content.Context
 import android.util.AttributeSet
 
-class  RecorderVisualizer : BaseVisualizer {
+class RecorderVisualizer : BaseVisualizer {
 
     constructor(context: Context?) : super(context)
 

@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
-        android:text="Music Name"
+        android:hint="Music Name"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -71,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Music Created Date"
+        android:hint="Music Created Date"
         app:layout_constraintStart_toStartOf="@+id/music_name_tv"
         app:layout_constraintTop_toBottomOf="@+id/music_name_tv" />
 
